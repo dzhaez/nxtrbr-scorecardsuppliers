@@ -42,6 +42,7 @@ export interface Translation {
   entraError: string;
   entraNotAuthorized: string;
   entraNotConfigured: string;
+  devModeButton: string;
   firstAccessError: string;
   idAlreadyRegistered: string;
   idNotFoundInSpreadsheet: string;
@@ -321,6 +322,7 @@ const pt: Translation = {
   entraError: 'Não foi possível entrar com sua conta Microsoft. Tente novamente.',
   entraNotAuthorized: 'Sua conta não tem acesso a este sistema. Procure o administrador.',
   entraNotConfigured: 'O acesso com Microsoft ainda não foi configurado. Procure o suporte.',
+  devModeButton: 'Entrar em modo desenvolvimento',
   firstAccessError: 'Não foi possível cadastrar. Verifique os dados e tente novamente.',
   idAlreadyRegistered: 'Este ID já está cadastrado no sistema.',
   idNotFoundInSpreadsheet: 'Este ID não foi encontrado na planilha importada.',
@@ -580,6 +582,7 @@ const en: Translation = {
   entraError: 'Could not sign in with your Microsoft account. Please try again.',
   entraNotAuthorized: 'Your account does not have access to this system. Contact your administrator.',
   entraNotConfigured: 'Microsoft sign-in is not configured yet. Please contact support.',
+  devModeButton: 'Sign in (dev mode)',
   firstAccessError: 'Could not register. Please check your details and try again.',
   idAlreadyRegistered: 'This ID is already registered in the system.',
   idNotFoundInSpreadsheet: 'This ID was not found in the imported spreadsheet.',
@@ -839,6 +842,7 @@ const pl: Translation = {
   entraError: 'Nie udało się zalogować kontem Microsoft. Spróbuj ponownie.',
   entraNotAuthorized: 'Twoje konto nie ma dostępu do tego systemu. Skontaktuj się z administratorem.',
   entraNotConfigured: 'Logowanie Microsoft nie jest jeszcze skonfigurowane. Skontaktuj się z pomocą techniczną.',
+  devModeButton: 'Zaloguj (tryb deweloperski)',
   firstAccessError: 'Nie udało się zarejestrować. Sprawdź dane i spróbuj ponownie.',
   idAlreadyRegistered: 'To ID jest już zarejestrowane w systemie.',
   idNotFoundInSpreadsheet: 'To ID nie zostało znalezione w zaimportowanym arkuszu.',
@@ -1098,6 +1102,7 @@ const es: Translation = {
   entraError: 'No se pudo iniciar sesión con su cuenta de Microsoft. Intente nuevamente.',
   entraNotAuthorized: 'Su cuenta no tiene acceso a este sistema. Contacte al administrador.',
   entraNotConfigured: 'El acceso con Microsoft aún no está configurado. Contacte al soporte.',
+  devModeButton: 'Iniciar sesión (modo desarrollo)',
   firstAccessError: 'No se pudo registrar. Verifique los datos e intente nuevamente.',
   idAlreadyRegistered: 'Este ID ya está registrado en el sistema.',
   idNotFoundInSpreadsheet: 'Este ID no se encontró en la hoja importada.',

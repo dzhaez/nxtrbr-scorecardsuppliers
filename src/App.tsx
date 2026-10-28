@@ -4,7 +4,7 @@ import LoginScreen from './components/LoginScreen';
 import { Loader2 } from 'lucide-react';
 import { supabase, fetchUserProfile, type Usuario } from './lib/supabase';
 import { LanguageProvider, useI18n } from './i18n/LanguageContext';
-import { signOutOfEntra } from './lib/entra';
+import { signOutOfEntra, isDevMode } from './lib/entra';
 
 const MainScreen = lazy(() => import('./components/MainScreen'));
 const AdminScreen = lazy(() => import('./components/AdminScreen'));
@@ -30,6 +30,14 @@ function AppInner() {
   const authReadyRef = useRef(false);
 
   useEffect(() => {
+    if (isDevMode) {
+      setUserId('dev-user');
+      setIsAdmin(true);
+      setAuthReady(true);
+      setScreen('main');
+      return;
+    }
+
     let cancelled = false;
 
     // Safety timeout: if neither onAuthStateChange nor getSession resolves

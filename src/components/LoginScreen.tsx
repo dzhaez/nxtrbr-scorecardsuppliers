@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { AlertCircle, Loader2, Globe, ShieldCheck } from 'lucide-react';
 import { exchangeEntraToken, registrarAcesso, EntraAccessDeniedError } from '@/lib/supabase';
-import { completeEntraSignIn, startEntraSignIn, isEntraConfigured } from '@/lib/entra';
+import { completeEntraSignIn, startEntraSignIn, isEntraConfigured, isDevMode } from '@/lib/entra';
 import { useI18n } from '@/i18n/LanguageContext';
 import { LANGUAGES, type LanguageCode } from '@/i18n/translations';
 
@@ -61,6 +61,10 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
       setError(t.entraError);
       setStatus('idle');
     }
+  }
+
+  function handleDevMode() {
+    onLogin('dev-user', true);
   }
 
   function selectLanguage(code: LanguageCode) {
@@ -136,7 +140,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
               type="button"
               className="w-full h-12 text-base"
               onClick={handleSignIn}
-              disabled={busy || !isEntraConfigured}
+              disabled={busy || (!isEntraConfigured && !isDevMode)}
             >
               {busy ? (
                 <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> {t.signingIn}</>
@@ -144,6 +148,18 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
                 <><ShieldCheck className="w-4 h-4 mr-2" /> {t.entraSignInButton}</>
               )}
             </Button>
+
+            {isDevMode && (
+              <Button
+                type="button"
+                variant="secondary"
+                className="w-full h-11 text-sm"
+                onClick={handleDevMode}
+                disabled={busy}
+              >
+                {t.devModeButton}
+              </Button>
+            )}
           </CardContent>
         </Card>
 
