@@ -1,0 +1,2 @@
+[functions.entra-exchange]
+verify_jwt = false

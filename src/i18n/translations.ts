@@ -37,6 +37,11 @@ export interface Translation {
   showPassword: string;
   hidePassword: string;
   loginError: string;
+  entraDescription: string;
+  entraSignInButton: string;
+  entraError: string;
+  entraNotAuthorized: string;
+  entraNotConfigured: string;
   firstAccessError: string;
   idAlreadyRegistered: string;
   idNotFoundInSpreadsheet: string;
@@ -311,6 +316,11 @@ const pt: Translation = {
   showPassword: 'Mostrar senha',
   hidePassword: 'Ocultar senha',
   loginError: 'ID ou senha inválidos. Verifique e tente novamente.',
+  entraDescription: 'Entre com sua conta corporativa Microsoft para acessar o sistema.',
+  entraSignInButton: 'Entrar com Microsoft',
+  entraError: 'Não foi possível entrar com sua conta Microsoft. Tente novamente.',
+  entraNotAuthorized: 'Sua conta não tem acesso a este sistema. Procure o administrador.',
+  entraNotConfigured: 'O acesso com Microsoft ainda não foi configurado. Procure o suporte.',
   firstAccessError: 'Não foi possível cadastrar. Verifique os dados e tente novamente.',
   idAlreadyRegistered: 'Este ID já está cadastrado no sistema.',
   idNotFoundInSpreadsheet: 'Este ID não foi encontrado na planilha importada.',
@@ -565,6 +575,11 @@ const en: Translation = {
   showPassword: 'Show password',
   hidePassword: 'Hide password',
   loginError: 'Invalid ID or password. Please check and try again.',
+  entraDescription: 'Sign in with your Microsoft work account to access the system.',
+  entraSignInButton: 'Sign in with Microsoft',
+  entraError: 'Could not sign in with your Microsoft account. Please try again.',
+  entraNotAuthorized: 'Your account does not have access to this system. Contact your administrator.',
+  entraNotConfigured: 'Microsoft sign-in is not configured yet. Please contact support.',
   firstAccessError: 'Could not register. Please check your details and try again.',
   idAlreadyRegistered: 'This ID is already registered in the system.',
   idNotFoundInSpreadsheet: 'This ID was not found in the imported spreadsheet.',
@@ -819,6 +834,11 @@ const pl: Translation = {
   showPassword: 'Pokaż hasło',
   hidePassword: 'Ukryj hasło',
   loginError: 'Nieprawidłowe ID lub hasło. Sprawdź i spróbuj ponownie.',
+  entraDescription: 'Zaloguj się służbowym kontem Microsoft, aby uzyskać dostęp do systemu.',
+  entraSignInButton: 'Zaloguj się kontem Microsoft',
+  entraError: 'Nie udało się zalogować kontem Microsoft. Spróbuj ponownie.',
+  entraNotAuthorized: 'Twoje konto nie ma dostępu do tego systemu. Skontaktuj się z administratorem.',
+  entraNotConfigured: 'Logowanie Microsoft nie jest jeszcze skonfigurowane. Skontaktuj się z pomocą techniczną.',
   firstAccessError: 'Nie udało się zarejestrować. Sprawdź dane i spróbuj ponownie.',
   idAlreadyRegistered: 'To ID jest już zarejestrowane w systemie.',
   idNotFoundInSpreadsheet: 'To ID nie zostało znalezione w zaimportowanym arkuszu.',
@@ -1073,6 +1093,11 @@ const es: Translation = {
   showPassword: 'Mostrar contraseña',
   hidePassword: 'Ocultar contraseña',
   loginError: 'ID o contraseña inválidos. Verifique e intente nuevamente.',
+  entraDescription: 'Inicie sesión con su cuenta corporativa de Microsoft para acceder al sistema.',
+  entraSignInButton: 'Iniciar sesión con Microsoft',
+  entraError: 'No se pudo iniciar sesión con su cuenta de Microsoft. Intente nuevamente.',
+  entraNotAuthorized: 'Su cuenta no tiene acceso a este sistema. Contacte al administrador.',
+  entraNotConfigured: 'El acceso con Microsoft aún no está configurado. Contacte al soporte.',
   firstAccessError: 'No se pudo registrar. Verifique los datos e intente nuevamente.',
   idAlreadyRegistered: 'Este ID ya está registrado en el sistema.',
   idNotFoundInSpreadsheet: 'Este ID no se encontró en la hoja importada.',

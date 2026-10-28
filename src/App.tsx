@@ -4,6 +4,7 @@ import LoginScreen from './components/LoginScreen';
 import { Loader2 } from 'lucide-react';
 import { supabase, fetchUserProfile, type Usuario } from './lib/supabase';
 import { LanguageProvider, useI18n } from './i18n/LanguageContext';
+import { signOutOfEntra } from './lib/entra';
 
 const MainScreen = lazy(() => import('./components/MainScreen'));
 const AdminScreen = lazy(() => import('./components/AdminScreen'));
@@ -114,6 +115,7 @@ function AppInner() {
 
   async function handleLogout() {
     await supabase.auth.signOut();
+    await signOutOfEntra();
     setUserId('');
     setIsAdmin(false);
     setScreen('login');

@@ -11,45 +11,43 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   },
 });
 
-/**
- * Sign-in and first-access both go through a server-side broker so that the
- * browser never receives account e-mail addresses and cannot probe which
- * employee IDs exist.
- */
-export interface AuthBrokerResult {
-  ok: boolean;
-  id_usuario?: string;
-  is_admin?: boolean;
+export class EntraAccessDeniedError extends Error {}
+
+export interface EntraExchangeResult {
+  id_usuario: string;
+  is_admin: boolean;
 }
 
-export async function callAuthBroker(payload: {
-  action: 'login' | 'register';
-  id_usuario: string;
-  password: string;
-  email?: string;
-}): Promise<AuthBrokerResult> {
-  try {
-    const res = await fetch(`${supabaseUrl}/functions/v1/auth-broker`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        apikey: supabaseAnonKey,
-        Authorization: `Bearer ${supabaseAnonKey}`,
-      },
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) return { ok: false };
-    const data = await res.json();
-    if (!data?.access_token || !data?.refresh_token) return { ok: false };
-    const { error } = await supabase.auth.setSession({
-      access_token: data.access_token,
-      refresh_token: data.refresh_token,
-    });
-    if (error) return { ok: false };
-    return { ok: true, id_usuario: data.id_usuario, is_admin: data.is_admin === true };
-  } catch {
-    return { ok: false };
+/**
+ * Trades a Microsoft Entra ID token for a Supabase session. The server validates
+ * the token signature and only admits employee IDs present in the purchasing
+ * spreadsheet, so the browser never handles passwords or account e-mails.
+ */
+export async function exchangeEntraToken(idToken: string): Promise<EntraExchangeResult> {
+  const res = await fetch(`${supabaseUrl}/functions/v1/entra-exchange`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      apikey: supabaseAnonKey,
+      Authorization: `Bearer ${supabaseAnonKey}`,
+    },
+    body: JSON.stringify({ id_token: idToken }),
+  });
+  if (res.status === 403) throw new EntraAccessDeniedError('not_authorized');
+  if (!res.ok) throw new Error(`entra_exchange_failed (${res.status})`);
+
+  const data = await res.json();
+  if (!data?.access_token || !data?.refresh_token || typeof data?.id_usuario !== 'string') {
+    throw new Error('entra_exchange_invalid_response');
   }
+
+  const { error } = await supabase.auth.setSession({
+    access_token: data.access_token,
+    refresh_token: data.refresh_token,
+  });
+  if (error) throw error;
+
+  return { id_usuario: data.id_usuario, is_admin: data.is_admin === true };
 }
 
 export interface Importacao {
