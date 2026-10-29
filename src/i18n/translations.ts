@@ -42,6 +42,9 @@ export interface Translation {
   entraError: string;
   entraNotAuthorized: string;
   entraNotConfigured: string;
+  entraIframeTitle: string;
+  entraIframeDesc: string;
+  openInNewTab: string;
   devModeButton: string;
   firstAccessError: string;
   idAlreadyRegistered: string;
@@ -353,6 +356,9 @@ const pt: Translation = {
   entraError: 'Não foi possível entrar com sua conta Microsoft. Tente novamente.',
   entraNotAuthorized: 'Sua conta não tem acesso a este sistema. Procure o administrador.',
   entraNotConfigured: 'O acesso com Microsoft ainda não foi configurado. Procure o suporte.',
+  entraIframeTitle: 'Abra a aplicação em uma aba separada',
+  entraIframeDesc: 'Por segurança, a Microsoft não permite entrar com a aplicação incorporada nesta janela. Abra a aplicação publicada em uma nova aba para fazer login.',
+  openInNewTab: 'Abrir em nova aba',
   devModeButton: 'Entrar em modo desenvolvimento',
   firstAccessError: 'Não foi possível cadastrar. Verifique os dados e tente novamente.',
   idAlreadyRegistered: 'Este ID já está cadastrado no sistema.',
@@ -643,6 +649,9 @@ const en: Translation = {
   entraError: 'Could not sign in with your Microsoft account. Please try again.',
   entraNotAuthorized: 'Your account does not have access to this system. Contact your administrator.',
   entraNotConfigured: 'Microsoft sign-in is not configured yet. Please contact support.',
+  entraIframeTitle: 'Open the app in a separate tab',
+  entraIframeDesc: 'For security reasons, Microsoft does not allow signing in while the app is embedded in this window. Open the published app in a new tab to sign in.',
+  openInNewTab: 'Open in new tab',
   devModeButton: 'Sign in (dev mode)',
   firstAccessError: 'Could not register. Please check your details and try again.',
   idAlreadyRegistered: 'This ID is already registered in the system.',
@@ -933,6 +942,9 @@ const pl: Translation = {
   entraError: 'Nie udało się zalogować kontem Microsoft. Spróbuj ponownie.',
   entraNotAuthorized: 'Twoje konto nie ma dostępu do tego systemu. Skontaktuj się z administratorem.',
   entraNotConfigured: 'Logowanie Microsoft nie jest jeszcze skonfigurowane. Skontaktuj się z pomocą techniczną.',
+  entraIframeTitle: 'Otwórz aplikację w osobnej karcie',
+  entraIframeDesc: 'Ze względów bezpieczeństwa Microsoft nie pozwala logować się, gdy aplikacja jest osadzona w tym oknie. Otwórz opublikowaną aplikację w nowej karcie, aby się zalogować.',
+  openInNewTab: 'Otwórz w nowej karcie',
   devModeButton: 'Zaloguj (tryb deweloperski)',
   firstAccessError: 'Nie udało się zarejestrować. Sprawdź dane i spróbuj ponownie.',
   idAlreadyRegistered: 'To ID jest już zarejestrowane w systemie.',
@@ -1223,6 +1235,9 @@ const es: Translation = {
   entraError: 'No se pudo iniciar sesión con su cuenta de Microsoft. Intente nuevamente.',
   entraNotAuthorized: 'Su cuenta no tiene acceso a este sistema. Contacte al administrador.',
   entraNotConfigured: 'El acceso con Microsoft aún no está configurado. Contacte al soporte.',
+  entraIframeTitle: 'Abra la aplicación en una pestaña separada',
+  entraIframeDesc: 'Por seguridad, Microsoft no permite iniciar sesión con la aplicación incrustada en esta ventana. Abra la aplicación publicada en una nueva pestaña para iniciar sesión.',
+  openInNewTab: 'Abrir en nueva pestaña',
   devModeButton: 'Iniciar sesión (modo desarrollo)',
   firstAccessError: 'No se pudo registrar. Verifique los datos e intente nuevamente.',
   idAlreadyRegistered: 'Este ID ya está registrado en el sistema.',

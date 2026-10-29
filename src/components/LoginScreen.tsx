@@ -1,9 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { AlertCircle, Loader2, Globe, ShieldCheck } from 'lucide-react';
+import { AlertCircle, Loader2, Globe, ShieldCheck, ExternalLink, Info } from 'lucide-react';
 import { exchangeEntraToken, registrarAcesso, EntraAccessDeniedError } from '@/lib/supabase';
-import { completeEntraSignIn, startEntraSignIn, isEntraConfigured, isDevMode } from '@/lib/entra';
+import {
+  completeEntraSignIn,
+  startEntraSignIn,
+  isEntraConfigured,
+  isDevMode,
+  isInIframe,
+  publishedAppUrl,
+} from '@/lib/entra';
 import { useI18n } from '@/i18n/LanguageContext';
 import { LANGUAGES, type LanguageCode } from '@/i18n/translations';
 
@@ -32,7 +39,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
   }
 
   useEffect(() => {
-    if (!isEntraConfigured || handledRedirect.current) return;
+    if (!isEntraConfigured || isInIframe || handledRedirect.current) return;
     handledRedirect.current = true;
     setStatus('verifying');
     completeEntraSignIn()
@@ -129,6 +136,23 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            {isInIframe && !isDevMode ? (
+              <div role="status" className="space-y-4 animate-fade-in">
+                <div className="flex items-start gap-3 p-4 rounded-lg border border-primary/30 bg-primary/10 text-sm text-foreground">
+                  <Info className="w-5 h-5 mt-0.5 shrink-0 text-primary" aria-hidden="true" />
+                  <div className="space-y-1">
+                    <p className="font-semibold">{t.entraIframeTitle}</p>
+                    <p className="text-muted-foreground leading-relaxed">{t.entraIframeDesc}</p>
+                  </div>
+                </div>
+                <Button asChild className="w-full h-12 text-base">
+                  <a href={publishedAppUrl()} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="w-4 h-4 mr-2" aria-hidden="true" /> {t.openInNewTab}
+                  </a>
+                </Button>
+              </div>
+            ) : (
+            <>
             {message && (
               <div className="flex items-start gap-2 p-3 rounded-lg bg-destructive/10 text-destructive text-sm animate-fade-in">
                 <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
@@ -159,6 +183,8 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
               >
                 {t.devModeButton}
               </Button>
+            )}
+            </>
             )}
           </CardContent>
         </Card>

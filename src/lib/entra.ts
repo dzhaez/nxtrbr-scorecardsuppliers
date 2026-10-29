@@ -10,6 +10,20 @@ const apiScope = setting('VITE_ENTRA_API_SCOPE');
 
 export const isEntraConfigured = Boolean(tenantId && clientId) || isDevMode;
 
+// MSAL refuses redirect login inside iframes (redirect_in_iframe); cross-origin access to window.top also means embedded.
+export const isInIframe = (() => {
+  try {
+    return window.self !== window.top;
+  } catch {
+    return true;
+  }
+})();
+
+// TODO: set VITE_PUBLISHED_APP_URL in app-config.json to the published Catalyst URL.
+export function publishedAppUrl(): string {
+  return setting('VITE_PUBLISHED_APP_URL') || window.location.href;
+}
+
 function resolvedAuthority(): string {
   if (authority) return authority;
   return `https://login.microsoftonline.com/${tenantId}`;
@@ -48,12 +62,13 @@ async function getMsal(): Promise<PublicClientApplication> {
 
 export async function startEntraSignIn(): Promise<void> {
   if (isDevMode) return;
+  if (isInIframe) throw new Error('entra_in_iframe');
   const msal = await getMsal();
   await msal.loginRedirect({ scopes: resolvedScopes() });
 }
 
 export function completeEntraSignIn(): Promise<string | null> {
-  if (isDevMode) return Promise.resolve(null);
+  if (isDevMode || isInIframe) return Promise.resolve(null);
   redirectPromise ??= getMsal()
     .then((msal) => msal.handleRedirectPromise())
     .then((result) => result?.idToken ?? null);
