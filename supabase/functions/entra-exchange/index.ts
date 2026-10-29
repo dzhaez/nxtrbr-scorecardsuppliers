@@ -1,5 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-// entra-exchange: Entra ID token exchange with staged error codes + diagnostics
+// entra-exchange: Entra ID token exchange with staged error codes
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { createRemoteJWKSet, jwtVerify } from "npm:jose@5";
 
@@ -258,7 +258,7 @@ Deno.serve(async (req: Request) => {
           });
         }
       }
-      return respond(500, { error: "server_error_create_user", ...(isInitialAdmin ? { diagnostic_code: createError?.code ?? "missing_user", diagnostic_message: createError?.message?.slice(0, 200) ?? "No user returned" } : {}) });
+      return respond(500, { error: "server_error_create_user" });
     }
 
     authUserId = created.user.id;
