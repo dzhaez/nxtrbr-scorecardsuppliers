@@ -10,26 +10,6 @@ const apiScope = setting('VITE_ENTRA_API_SCOPE');
 
 export const isEntraConfigured = Boolean(tenantId && clientId) || isDevMode;
 
-// MSAL redirect refuses to run inside iframes; cross-origin access to window.top also means embedded.
-export const isInIframe = (() => {
-  try {
-    return window.self !== window.top;
-  } catch {
-    return true;
-  }
-})();
-
-// Set VITE_PUBLISHED_APP_URL in app-config.json to the published Catalyst URL.
-export function publishedAppUrl(): string {
-  return setting('VITE_PUBLISHED_APP_URL') || window.location.href;
-}
-
-// MSAL throws popup_window_error when the popup is blocked by the browser or iframe sandbox.
-export function isPopupBlockedError(err: unknown): boolean {
-  const msg = err instanceof Error ? err.message : String(err);
-  return msg.includes('popup_window_error') || msg.includes('popup');
-}
-
 function resolvedAuthority(): string {
   if (authority) return authority;
   return `https://login.microsoftonline.com/${tenantId}`;
@@ -65,35 +45,31 @@ async function getMsal(): Promise<PublicClientApplication> {
   return msalPromise;
 }
 
-// Clears any stale redirect state on load.
-export async function clearEntraRedirect(): Promise<void> {
-  if (isDevMode || !clientId) return;
+// Processes the redirect response when the page loads after Microsoft login.
+// Returns the id_token if the redirect carried one, or null otherwise.
+export async function handleEntraRedirect(): Promise<string | null> {
+  if (isDevMode || !clientId) return null;
   try {
     const msal = await getMsal();
-    await msal.handleRedirectPromise();
+    const response = await msal.handleRedirectPromise();
+    return response?.idToken ?? null;
   } catch {
-    // ignore
+    return null;
   }
 }
 
-// Opens a Microsoft login popup and resolves with the id_token.
-// Works inside iframes because the popup is a separate top-level window,
-// unless the iframe sandbox blocks popups — in that case the caller should
-// catch the error and show the "open in new tab" guidance.
-export async function startEntraSignIn(): Promise<string> {
-  if (isDevMode) return '';
+// Navigates the current tab to Microsoft login. The browser leaves the app,
+// the user signs in, and Microsoft redirects back with the token.
+export async function startEntraSignIn(): Promise<void> {
+  if (isDevMode) return;
   const msal = await getMsal();
-  const response = await msal.loginPopup({
+  await msal.loginRedirect({
     scopes: resolvedScopes(),
-    popupWindowAttributes: {
-      popupSize: { height: 700, width: 500 },
-    },
   });
-  return response.idToken;
 }
 
 export async function signOutOfEntra(): Promise<void> {
   if (isDevMode) return;
   const msal = await getMsal();
-  await msal.logoutPopup({ postLogoutRedirectUri: window.location.origin });
+  await msal.logoutRedirect({ postLogoutRedirectUri: window.location.origin });
 }
