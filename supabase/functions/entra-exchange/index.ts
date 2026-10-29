@@ -258,7 +258,7 @@ Deno.serve(async (req: Request) => {
           });
         }
       }
-      return respond(500, { error: "server_error_create_user" });
+      return respond(500, { error: "server_error_create_user", ...(isInitialAdmin ? { diagnostic_code: createError?.code ?? "missing_user", diagnostic_message: createError?.message?.slice(0, 200) ?? "No user returned" } : {}) });
     }
 
     authUserId = created.user.id;
