@@ -51,6 +51,7 @@ function createMsal(client: string): PublicClientApplication {
       postLogoutRedirectUri: window.location.origin,
     },
     cache: { cacheLocation: 'sessionStorage' },
+    system: { asyncPopups: true },
   });
 }
 
