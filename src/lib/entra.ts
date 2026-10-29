@@ -1,12 +1,12 @@
 import { PublicClientApplication } from '@azure/msal-browser';
+import { setting, isDevMode } from './config';
 
-const tenantId = import.meta.env.VITE_ENTRA_TENANT_ID as string | undefined;
-const clientId = import.meta.env.VITE_ENTRA_CLIENT_ID as string | undefined;
-const authority = import.meta.env.VITE_ENTRA_AUTHORITY as string | undefined;
-const apiScope = import.meta.env.VITE_ENTRA_API_SCOPE as string | undefined;
+export { isDevMode };
 
-/** When true, the app skips Entra sign-in entirely and logs in as a dev user. */
-export const isDevMode = import.meta.env.VITE_DEV_MODE === 'true';
+const tenantId = setting('VITE_ENTRA_TENANT_ID');
+const clientId = setting('VITE_ENTRA_CLIENT_ID');
+const authority = setting('VITE_ENTRA_AUTHORITY');
+const apiScope = setting('VITE_ENTRA_API_SCOPE');
 
 export const isEntraConfigured = Boolean(tenantId && clientId) || isDevMode;
 
@@ -52,11 +52,6 @@ export async function startEntraSignIn(): Promise<void> {
   await msal.loginRedirect({ scopes: resolvedScopes() });
 }
 
-/**
- * Returns the Entra ID token after the browser comes back from Microsoft, or null
- * when the page was not opened from a sign-in redirect. Memoized because the
- * redirect response can only be read once.
- */
 export function completeEntraSignIn(): Promise<string | null> {
   if (isDevMode) return Promise.resolve(null);
   redirectPromise ??= getMsal()

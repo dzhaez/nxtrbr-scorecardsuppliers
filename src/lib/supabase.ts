@@ -1,7 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
+import { setting } from './config';
 
-const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL as string) || 'http://localhost:54321';
-const supabaseAnonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY as string) || 'placeholder';
+const supabaseUrl = setting('VITE_SUPABASE_URL');
+const supabaseAnonKey = setting('VITE_SUPABASE_ANON_KEY');
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {

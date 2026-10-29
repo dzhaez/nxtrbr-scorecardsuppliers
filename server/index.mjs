@@ -1,6 +1,7 @@
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
+import { publicConfig } from './config.mjs';
 
 const PORT = process.env.PORT || 8080;
 const DIST = join(process.cwd(), 'dist');
@@ -24,6 +25,7 @@ const MIME = {
 };
 
 const indexHtml = await readFile(join(DIST, 'index.html'), 'utf-8');
+const config = JSON.stringify(publicConfig(process.env));
 
 function send(res, status, body, headers = {}) {
   res.writeHead(status, headers);
@@ -34,6 +36,14 @@ const server = createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
   let pathname = decodeURIComponent(url.pathname);
   if (pathname === '/') pathname = '/index.html';
+
+  if (pathname === '/app-config.json') {
+    return send(res, 200, config, {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-store',
+      'X-Content-Type-Options': 'nosniff',
+    });
+  }
 
   const safe = normalize(pathname).replace(/^(\.\.[/\\])+/, '');
   const filePath = join(DIST, safe);
