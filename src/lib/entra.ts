@@ -29,6 +29,7 @@ function createMsal(client: string): PublicClientApplication {
       authority: resolvedAuthority(),
       redirectUri: window.location.origin,
       postLogoutRedirectUri: window.location.origin,
+      navigateToLoginRequestUrl: false,
     },
     cache: { cacheLocation: 'sessionStorage' },
   });
@@ -45,27 +46,41 @@ async function getMsal(): Promise<PublicClientApplication> {
   return msalPromise;
 }
 
-// Processes the redirect response when the page loads after Microsoft login.
-// Returns the id_token if the redirect carried one, or null otherwise.
-export async function handleEntraRedirect(): Promise<string | null> {
-  if (isDevMode || !clientId) return null;
-  try {
-    const msal = await getMsal();
-    const response = await msal.handleRedirectPromise();
-    return response?.idToken ?? null;
-  } catch {
-    return null;
-  }
+function isEmbedded(): boolean {
+  return window.self !== window.top;
 }
 
-// Navigates the current tab to Microsoft login. The browser leaves the app,
-// the user signs in, and Microsoft redirects back with the token.
+let redirectResult: Promise<string | null> | null = null;
+
+// Process each redirect once, including React StrictMode remounts.
+export function handleEntraRedirect(): Promise<string | null> {
+  if (isDevMode || !clientId || isEmbedded()) return Promise.resolve(null);
+  redirectResult ??= (async () => {
+    const msal = await getMsal();
+    const response = await msal.handleRedirectPromise();
+    if (response?.idToken) return response.idToken;
+    const url = new URL(window.location.href);
+    if (url.searchParams.get('entra_login') === '1') {
+      url.searchParams.delete('entra_login');
+      window.history.replaceState(null, '', url.pathname + url.search + url.hash);
+      await msal.loginRedirect({ scopes: resolvedScopes() });
+    }
+    return null;
+  })();
+  return redirectResult;
+}
+
+// Leave the editor iframe in the SAME browser tab before Microsoft sign-in.
 export async function startEntraSignIn(): Promise<void> {
   if (isDevMode) return;
+  if (isEmbedded()) {
+    const url = new URL('/', window.location.origin);
+    url.searchParams.set('entra_login', '1');
+    window.top!.location.href = url.href;
+    return;
+  }
   const msal = await getMsal();
-  await msal.loginRedirect({
-    scopes: resolvedScopes(),
-  });
+  await msal.loginRedirect({ scopes: resolvedScopes() });
 }
 
 export async function signOutOfEntra(): Promise<void> {
