@@ -36,7 +36,11 @@ export async function exchangeEntraToken(idToken: string): Promise<EntraExchange
     body: JSON.stringify({ id_token: idToken }),
   });
   if (res.status === 403) throw new EntraAccessDeniedError('not_authorized');
-  if (!res.ok) throw new Error(`entra_exchange_failed (${res.status})`);
+  if (!res.ok) {
+    const failure = await res.json().catch(() => null);
+    const code = typeof failure?.error === 'string' && /^[a-z_]{1,80}$/.test(failure.error) ? failure.error : 'unknown';
+    throw new Error(`entra_exchange_failed (${res.status}): ${code}`);
+  }
 
   const data = await res.json();
   if (!data?.access_token || !data?.refresh_token || typeof data?.id_usuario !== 'string') {
