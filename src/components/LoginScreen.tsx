@@ -40,9 +40,13 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
     if (!isEntraConfigured || redirectHandled.current) return;
     redirectHandled.current = true;
     (async () => {
-      const idToken = await handleEntraRedirect();
-      if (idToken) {
-        await finishSignIn(idToken);
+      try {
+        const idToken = await handleEntraRedirect();
+        if (idToken) await finishSignIn(idToken);
+      } catch (err) {
+        console.error('Entra redirect failed:', err);
+        setError(t.entraError);
+        setStatus('idle');
       }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
