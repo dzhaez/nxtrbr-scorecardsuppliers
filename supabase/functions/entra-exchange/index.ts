@@ -140,6 +140,7 @@ Deno.serve(async (req: Request) => {
           .eq("id", authUserId);
 
         if (linkError) {
+          console.error(JSON.stringify({ stage: "link_existing_usuarios", code: linkError.code, message: linkError.message }));
           return respond(500, { error: "server_error" });
         }
 
@@ -151,10 +152,15 @@ Deno.serve(async (req: Request) => {
 
       // Check if the auth account exists by email (getUserByEmail not available
       // in admin API, so listUsers with filter).
-      const { data: usersList } = await admin.auth.admin.listUsers({
+      const { data: usersList, error: listError } = await admin.auth.admin.listUsers({
         page: 1,
         perPage: 1000,
       });
+
+      if (listError) {
+        console.error(JSON.stringify({ stage: "list_users_by_email", code: listError.code, message: listError.message }));
+        return respond(500, { error: "server_error" });
+      }
 
       const existingByEmail = usersList?.users?.find(
         (u) => u.email?.toLowerCase() === upn,
@@ -183,6 +189,7 @@ Deno.serve(async (req: Request) => {
             });
 
           if (insertError) {
+            console.error(JSON.stringify({ stage: "insert_usuarios_for_existing_auth", code: insertError.code, message: insertError.message }));
             return respond(500, { error: "server_error" });
           }
         } else {
@@ -212,13 +219,14 @@ Deno.serve(async (req: Request) => {
       app_metadata: { auth_source: "entra", entra_tenant_id: tid, entra_oid: oid },
     });
     if (createError || !created.user) {
+      console.error(JSON.stringify({ stage: "create_user", code: createError?.code, message: createError?.message }));
       // If the email already exists, createUser fails. Try to find it.
       if (upn && createError?.message?.includes("already")) {
-        const { data: usersList } = await admin.auth.admin.listUsers({
+        const { data: usersList2 } = await admin.auth.admin.listUsers({
           page: 1,
           perPage: 1000,
         });
-        const existing = usersList?.users?.find(
+        const existing = usersList2?.users?.find(
           (u) => u.email?.toLowerCase() === upn,
         );
         if (existing) {
@@ -239,6 +247,7 @@ Deno.serve(async (req: Request) => {
                 entra_oid: oid,
               });
             if (insertError) {
+              console.error(JSON.stringify({ stage: "insert_usuarios_createUser_fallback", code: insertError.code, message: insertError.message }));
               return respond(500, { error: "server_error" });
             }
           }
@@ -270,6 +279,7 @@ Deno.serve(async (req: Request) => {
         .update({ is_admin: true, entra_tenant_id: tid, entra_oid: oid })
         .eq("id", authUserId);
       if (updateError) {
+        console.error(JSON.stringify({ stage: "insert_or_update_usuarios_new_user", insert_code: insertError.code, insert_message: insertError.message, update_code: updateError.code, update_message: updateError.message }));
         return respond(500, { error: "server_error" });
       }
     }
@@ -279,7 +289,8 @@ Deno.serve(async (req: Request) => {
       is_admin: true,
     });
   } catch (err) {
-    console.error("entra-exchange failed", err);
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error(JSON.stringify({ stage: "top_level_catch", message: msg }));
     return respond(500, { error: "server_error" });
   }
 });
@@ -290,9 +301,14 @@ async function generateSession(
   authUserId: string,
   profile: { id_usuario: string; is_admin: boolean },
 ): Promise<Response> {
-  const { data: authUser } = await admin.auth.admin.getUserById(authUserId);
+  const { data: authUser, error: getUserError } = await admin.auth.admin.getUserById(authUserId);
+  if (getUserError) {
+    console.error(JSON.stringify({ stage: "get_user_by_id", code: getUserError.code, message: getUserError.message }));
+    return respond(500, { error: "server_error" });
+  }
   const email = authUser?.user?.email;
   if (!email) {
+    console.error(JSON.stringify({ stage: "get_user_by_id_no_email" }));
     return respond(500, { error: "server_error" });
   }
 
@@ -302,6 +318,7 @@ async function generateSession(
   });
   const tokenHash = link?.properties?.hashed_token;
   if (linkError || !tokenHash) {
+    console.error(JSON.stringify({ stage: "generate_link", code: linkError?.code, message: linkError?.message }));
     return respond(500, { error: "server_error" });
   }
 
@@ -310,6 +327,7 @@ async function generateSession(
     token_hash: tokenHash,
   });
   if (verifyError || !session.session) {
+    console.error(JSON.stringify({ stage: "verify_otp", code: verifyError?.code, message: verifyError?.message }));
     return respond(500, { error: "server_error" });
   }
 
