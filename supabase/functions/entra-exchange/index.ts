@@ -209,6 +209,7 @@ Deno.serve(async (req: Request) => {
       email: upn || `${oid}@entra.local`,
       email_confirm: true,
       user_metadata: { id_usuario: idUsuario },
+      app_metadata: { auth_source: "entra", entra_tenant_id: tid, entra_oid: oid },
     });
     if (createError || !created.user) {
       // If the email already exists, createUser fails. Try to find it.
