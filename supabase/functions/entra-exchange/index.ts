@@ -141,7 +141,7 @@ Deno.serve(async (req: Request) => {
 
         if (linkError) {
           console.error(JSON.stringify({ stage: "link_existing_usuarios", code: linkError.code, message: linkError.message }));
-          return respond(500, { error: "server_error" });
+          return respond(500, { error: "server_error_link_existing_usuarios" });
         }
 
         return await generateSession(admin, publicClient, authUserId, {
@@ -159,7 +159,7 @@ Deno.serve(async (req: Request) => {
 
       if (listError) {
         console.error(JSON.stringify({ stage: "list_users_by_email", code: listError.code, message: listError.message }));
-        return respond(500, { error: "server_error" });
+        return respond(500, { error: "server_error_list_users_by_email" });
       }
 
       const existingByEmail = usersList?.users?.find(
@@ -190,7 +190,7 @@ Deno.serve(async (req: Request) => {
 
           if (insertError) {
             console.error(JSON.stringify({ stage: "insert_usuarios_for_existing_auth", code: insertError.code, message: insertError.message }));
-            return respond(500, { error: "server_error" });
+            return respond(500, { error: "server_error_insert_existing_profile" });
           }
         } else {
           // Get the id_usuario from the linked row.
@@ -248,7 +248,7 @@ Deno.serve(async (req: Request) => {
               });
             if (insertError) {
               console.error(JSON.stringify({ stage: "insert_usuarios_createUser_fallback", code: insertError.code, message: insertError.message }));
-              return respond(500, { error: "server_error" });
+              return respond(500, { error: "server_error_insert_fallback_profile" });
             }
           }
           return await generateSession(admin, publicClient, authUserId, {
@@ -257,7 +257,7 @@ Deno.serve(async (req: Request) => {
           });
         }
       }
-      return respond(500, { error: "server_error" });
+      return respond(500, { error: "server_error_create_user" });
     }
 
     authUserId = created.user.id;
@@ -280,7 +280,7 @@ Deno.serve(async (req: Request) => {
         .eq("id", authUserId);
       if (updateError) {
         console.error(JSON.stringify({ stage: "insert_or_update_usuarios_new_user", insert_code: insertError.code, insert_message: insertError.message, update_code: updateError.code, update_message: updateError.message }));
-        return respond(500, { error: "server_error" });
+        return respond(500, { error: "server_error_update_new_profile" });
       }
     }
 
@@ -291,7 +291,7 @@ Deno.serve(async (req: Request) => {
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error(JSON.stringify({ stage: "top_level_catch", message: msg }));
-    return respond(500, { error: "server_error" });
+    return respond(500, { error: "server_error_unexpected" });
   }
 });
 
@@ -304,12 +304,12 @@ async function generateSession(
   const { data: authUser, error: getUserError } = await admin.auth.admin.getUserById(authUserId);
   if (getUserError) {
     console.error(JSON.stringify({ stage: "get_user_by_id", code: getUserError.code, message: getUserError.message }));
-    return respond(500, { error: "server_error" });
+    return respond(500, { error: "server_error_get_auth_user" });
   }
   const email = authUser?.user?.email;
   if (!email) {
     console.error(JSON.stringify({ stage: "get_user_by_id_no_email" }));
-    return respond(500, { error: "server_error" });
+    return respond(500, { error: "server_error_missing_email" });
   }
 
   const { data: link, error: linkError } = await admin.auth.admin.generateLink({
@@ -319,7 +319,7 @@ async function generateSession(
   const tokenHash = link?.properties?.hashed_token;
   if (linkError || !tokenHash) {
     console.error(JSON.stringify({ stage: "generate_link", code: linkError?.code, message: linkError?.message }));
-    return respond(500, { error: "server_error" });
+    return respond(500, { error: "server_error_generate_session" });
   }
 
   const { data: session, error: verifyError } = await publicClient.auth.verifyOtp({
@@ -328,7 +328,7 @@ async function generateSession(
   });
   if (verifyError || !session.session) {
     console.error(JSON.stringify({ stage: "verify_otp", code: verifyError?.code, message: verifyError?.message }));
-    return respond(500, { error: "server_error" });
+    return respond(500, { error: "server_error_verify_session" });
   }
 
   return respond(200, {
