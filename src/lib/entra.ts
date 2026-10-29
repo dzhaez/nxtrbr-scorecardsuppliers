@@ -10,20 +10,6 @@ const apiScope = setting('VITE_ENTRA_API_SCOPE');
 
 export const isEntraConfigured = Boolean(tenantId && clientId) || isDevMode;
 
-// MSAL refuses redirect login inside iframes (redirect_in_iframe); cross-origin access to window.top also means embedded.
-export const isInIframe = (() => {
-  try {
-    return window.self !== window.top;
-  } catch {
-    return true;
-  }
-})();
-
-// TODO: set VITE_PUBLISHED_APP_URL in app-config.json to the published Catalyst URL.
-export function publishedAppUrl(): string {
-  return setting('VITE_PUBLISHED_APP_URL') || window.location.href;
-}
-
 function resolvedAuthority(): string {
   if (authority) return authority;
   return `https://login.microsoftonline.com/${tenantId}`;
@@ -35,7 +21,6 @@ function resolvedScopes(): string[] {
 }
 
 let msalPromise: Promise<PublicClientApplication> | null = null;
-let redirectPromise: Promise<string | null> | null = null;
 
 function createMsal(client: string): PublicClientApplication {
   return new PublicClientApplication({
@@ -60,23 +45,33 @@ async function getMsal(): Promise<PublicClientApplication> {
   return msalPromise;
 }
 
-export async function startEntraSignIn(): Promise<void> {
-  if (isDevMode) return;
-  if (isInIframe) throw new Error('entra_in_iframe');
-  const msal = await getMsal();
-  await msal.loginRedirect({ scopes: resolvedScopes() });
+// Clears any stale redirect state on load. Popup is the primary login method.
+export async function clearEntraRedirect(): Promise<void> {
+  if (isDevMode || !clientId) return;
+  try {
+    const msal = await getMsal();
+    await msal.handleRedirectPromise();
+  } catch {
+    // ignore — popup flow doesn't depend on redirect state
+  }
 }
 
-export function completeEntraSignIn(): Promise<string | null> {
-  if (isDevMode || isInIframe) return Promise.resolve(null);
-  redirectPromise ??= getMsal()
-    .then((msal) => msal.handleRedirectPromise())
-    .then((result) => result?.idToken ?? null);
-  return redirectPromise;
+// Opens a Microsoft login popup and resolves with the id_token.
+// Works inside iframes because the popup is a separate top-level window.
+export async function startEntraSignIn(): Promise<string> {
+  if (isDevMode) return '';
+  const msal = await getMsal();
+  const response = await msal.loginPopup({
+    scopes: resolvedScopes(),
+    popupWindowAttributes: {
+      popupSize: { height: 700, width: 500 },
+    },
+  });
+  return response.idToken;
 }
 
 export async function signOutOfEntra(): Promise<void> {
   if (isDevMode) return;
   const msal = await getMsal();
-  await msal.logoutRedirect();
+  await msal.logoutPopup({ postLogoutRedirectUri: window.location.origin });
 }
