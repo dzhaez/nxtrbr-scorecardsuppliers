@@ -27,10 +27,6 @@ function respond(status: number, body: unknown) {
   });
 }
 
-function escapeLike(value: string) {
-  return value.replace(/[\\%_]/g, "\\$&");
-}
-
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 200, headers: corsHeaders });
@@ -74,7 +70,6 @@ Deno.serve(async (req: Request) => {
     const upn = String(claims.preferred_username ?? claims.upn ?? claims.email ?? "")
       .trim()
       .toLowerCase();
-    const [localPart] = upn.split("@");
 
     const admin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
       auth: { persistSession: false, autoRefreshToken: false },
@@ -93,176 +88,234 @@ Deno.serve(async (req: Request) => {
       .eq("entra_oid", oid)
       .maybeSingle();
 
-    let authUserId: string;
-    let profile: { id_usuario: string; is_admin: boolean };
-    let needSetAdmin = false;
+    // Check if this identity is pre-authorized as an admin.
+    const { data: authorized } = await admin
+      .from("admin_authorizations")
+      .select("entra_tenant_id, entra_oid")
+      .eq("entra_tenant_id", tid)
+      .eq("entra_oid", oid)
+      .maybeSingle();
 
+    const isAuthorizedAdmin = !!authorized || isInitialAdmin;
+
+    // If the identity is already linked, just use it. Do NOT re-grant admin
+    // on every login — admin status is set once (at creation or via the panel)
+    // and can be revoked by removing the authorization.
     if (existingByOid) {
-      authUserId = existingByOid.id;
-      profile = { id_usuario: existingByOid.id_usuario, is_admin: existingByOid.is_admin };
+      const profile = {
+        id_usuario: existingByOid.id_usuario,
+        is_admin: existingByOid.is_admin === true,
+      };
 
-      if (isInitialAdmin && !existingByOid.is_admin) {
-        needSetAdmin = true;
-      }
-    } else {
-      // Check if there's a pre-existing usuarios row by username (local part)
-      // that hasn't been linked to an Entra identity yet.
-      const idPattern = escapeLike(localPart);
-      const { data: existingByName } = await admin
+      return await generateSession(admin, publicClient, existingByOid.id, profile);
+    }
+
+    // Identity not linked yet. Only the initial admin and pre-authorized
+    // users may sign in without being in the spreadsheet.
+    if (!isAuthorizedAdmin) {
+      return respond(403, { error: "not_authorized" });
+    }
+
+    // For the initial admin, check if an auth.users account already exists
+    // by email. If so, link it instead of creating a duplicate.
+    let authUserId: string;
+    let idUsuario: string;
+
+    if (upn) {
+      const { data: existingAuthUser } = await admin
         .from("usuarios")
-        .select("id, id_usuario, is_admin, entra_tenant_id, entra_oid")
-        .ilike("id_usuario", idPattern)
+        .select("id, id_usuario")
+        .ilike("id_usuario", upn.split("@")[0])
         .is("entra_oid", null)
         .maybeSingle();
 
-      // Check if this identity is pre-authorized as an admin.
-      const { data: authorized } = await admin
-        .from("admin_authorizations")
-        .select("entra_tenant_id, entra_oid")
-        .eq("entra_tenant_id", tid)
-        .eq("entra_oid", oid)
-        .maybeSingle();
-
-      const isAuthorizedAdmin = !!authorized || isInitialAdmin;
-
-      if (existingByName) {
+      if (existingAuthUser) {
         // Link this Entra identity to the existing usuarios row.
-        authUserId = existingByName.id;
+        authUserId = existingAuthUser.id;
+        idUsuario = existingAuthUser.id_usuario;
 
         const { error: linkError } = await admin
           .from("usuarios")
-          .update({ entra_tenant_id: tid, entra_oid: oid })
+          .update({ entra_tenant_id: tid, entra_oid: oid, is_admin: true })
           .eq("id", authUserId);
 
         if (linkError) {
           return respond(500, { error: "server_error" });
         }
 
-        const isAdmin = isAuthorizedAdmin || existingByName.is_admin;
-        profile = { id_usuario: existingByName.id_usuario, is_admin: isAdmin };
-        if (isAuthorizedAdmin && !existingByName.is_admin) {
-          needSetAdmin = true;
-        }
-      } else if (isAuthorizedAdmin) {
-        // Admin authorized by OID but not in the spreadsheet — create account.
-        // Use the OID as the id_usuario if no spreadsheet match exists.
-        const idUsuario = localPart || oid;
-
-        const { data: created, error: createError } = await admin.auth.admin.createUser({
-          email: upn || `${oid}@entra.local`,
-          email_confirm: true,
-          user_metadata: { id_usuario: idUsuario },
+        return await generateSession(admin, publicClient, authUserId, {
+          id_usuario: idUsuario,
+          is_admin: true,
         });
-        if (createError || !created.user) {
-          return respond(500, { error: "server_error" });
-        }
-        authUserId = created.user.id;
+      }
 
-        const { error: insertError } = await admin
+      // Check if the auth account exists by email (getUserByEmail not available
+      // in admin API, so listUsers with filter).
+      const { data: usersList } = await admin.auth.admin.listUsers({
+        page: 1,
+        perPage: 1000,
+      });
+
+      const existingByEmail = usersList?.users?.find(
+        (u) => u.email?.toLowerCase() === upn,
+      );
+
+      if (existingByEmail) {
+        authUserId = existingByEmail.id;
+
+        // Link the existing auth account to the Entra identity.
+        const { error: linkError } = await admin
           .from("usuarios")
-          .insert({
-            id: authUserId,
-            id_usuario: idUsuario,
-            is_admin: true,
-            entra_tenant_id: tid,
-            entra_oid: oid,
-          });
+          .update({ entra_tenant_id: tid, entra_oid: oid, is_admin: true })
+          .eq("id", authUserId);
 
-        if (insertError) {
-          // The auto-profile trigger may have already created the row.
-          const { error: updateError } = await admin
+        if (linkError) {
+          // The usuarios row might not exist yet — try inserting.
+          idUsuario = upn.split("@")[0];
+          const { error: insertError } = await admin
             .from("usuarios")
-            .update({ is_admin: true, entra_tenant_id: tid, entra_oid: oid })
-            .eq("id", authUserId);
-          if (updateError) {
+            .insert({
+              id: authUserId,
+              id_usuario: idUsuario,
+              is_admin: true,
+              entra_tenant_id: tid,
+              entra_oid: oid,
+            });
+
+          if (insertError) {
             return respond(500, { error: "server_error" });
           }
+        } else {
+          // Get the id_usuario from the linked row.
+          const { data: linked } = await admin
+            .from("usuarios")
+            .select("id_usuario")
+            .eq("id", authUserId)
+            .maybeSingle();
+          idUsuario = linked?.id_usuario ?? upn.split("@")[0];
         }
 
-        profile = { id_usuario: idUsuario, is_admin: true };
-      } else {
-        // Not authorized as admin. Check if the user exists in the spreadsheet.
-        const idPattern2 = escapeLike(localPart);
-        const { data: eligible } = await admin
-          .from("ordens_compra")
-          .select("id_usuario")
-          .ilike("id_usuario", idPattern2)
-          .limit(1)
-          .maybeSingle();
-
-        if (!eligible) {
-          return respond(403, { error: "not_authorized" });
-        }
-
-        const { data: created, error: createError } = await admin.auth.admin.createUser({
-          email: upn,
-          email_confirm: true,
-          user_metadata: { id_usuario: eligible.id_usuario },
+        return await generateSession(admin, publicClient, authUserId, {
+          id_usuario: idUsuario,
+          is_admin: true,
         });
-        if (createError || !created.user) {
-          return respond(403, { error: "not_authorized" });
-        }
-        authUserId = created.user.id;
-
-        // The auto-profile trigger creates the usuarios row.
-        // Link the Entra identity to it.
-        const { error: linkError } = await admin
-          .from("usuarios")
-          .update({ entra_tenant_id: tid, entra_oid: oid })
-          .eq("id", authUserId);
-
-        if (linkError) {
-          return respond(500, { error: "server_error" });
-        }
-
-        profile = { id_usuario: eligible.id_usuario, is_admin: false };
       }
     }
 
-    // Grant admin if needed (initial admin or pre-authorized).
-    if (needSetAdmin) {
-      const { error: adminError } = await admin
+    // No existing account found — create a new one.
+    idUsuario = upn ? upn.split("@")[0] : oid;
+
+    const { data: created, error: createError } = await admin.auth.admin.createUser({
+      email: upn || `${oid}@entra.local`,
+      email_confirm: true,
+      user_metadata: { id_usuario: idUsuario },
+    });
+    if (createError || !created.user) {
+      // If the email already exists, createUser fails. Try to find it.
+      if (upn && createError?.message?.includes("already")) {
+        const { data: usersList } = await admin.auth.admin.listUsers({
+          page: 1,
+          perPage: 1000,
+        });
+        const existing = usersList?.users?.find(
+          (u) => u.email?.toLowerCase() === upn,
+        );
+        if (existing) {
+          authUserId = existing.id;
+          const { error: linkError } = await admin
+            .from("usuarios")
+            .update({ entra_tenant_id: tid, entra_oid: oid, is_admin: true })
+            .eq("id", authUserId);
+
+          if (linkError) {
+            const { error: insertError } = await admin
+              .from("usuarios")
+              .insert({
+                id: authUserId,
+                id_usuario: idUsuario,
+                is_admin: true,
+                entra_tenant_id: tid,
+                entra_oid: oid,
+              });
+            if (insertError) {
+              return respond(500, { error: "server_error" });
+            }
+          }
+          return await generateSession(admin, publicClient, authUserId, {
+            id_usuario: idUsuario,
+            is_admin: true,
+          });
+        }
+      }
+      return respond(500, { error: "server_error" });
+    }
+
+    authUserId = created.user.id;
+
+    const { error: insertError } = await admin
+      .from("usuarios")
+      .insert({
+        id: authUserId,
+        id_usuario: idUsuario,
+        is_admin: true,
+        entra_tenant_id: tid,
+        entra_oid: oid,
+      });
+
+    if (insertError) {
+      // The auto-profile trigger may have already created the row.
+      const { error: updateError } = await admin
         .from("usuarios")
-        .update({ is_admin: true })
+        .update({ is_admin: true, entra_tenant_id: tid, entra_oid: oid })
         .eq("id", authUserId);
-      if (adminError) {
+      if (updateError) {
         return respond(500, { error: "server_error" });
       }
-      profile.is_admin = true;
     }
 
-    // Generate a Supabase session via magic link.
-    const { data: authUser } = await admin.auth.admin.getUserById(authUserId);
-    const email = authUser?.user?.email;
-    if (!email) {
-      return respond(500, { error: "server_error" });
-    }
-
-    const { data: link, error: linkError } = await admin.auth.admin.generateLink({
-      type: "magiclink",
-      email,
-    });
-    const tokenHash = link?.properties?.hashed_token;
-    if (linkError || !tokenHash) {
-      return respond(500, { error: "server_error" });
-    }
-
-    const { data: session, error: verifyError } = await publicClient.auth.verifyOtp({
-      type: "magiclink",
-      token_hash: tokenHash,
-    });
-    if (verifyError || !session.session) {
-      return respond(500, { error: "server_error" });
-    }
-
-    return respond(200, {
-      access_token: session.session.access_token,
-      refresh_token: session.session.refresh_token,
-      id_usuario: profile.id_usuario,
-      is_admin: profile.is_admin === true,
+    return await generateSession(admin, publicClient, authUserId, {
+      id_usuario: idUsuario,
+      is_admin: true,
     });
   } catch (err) {
     console.error("entra-exchange failed", err);
     return respond(500, { error: "server_error" });
   }
 });
+
+async function generateSession(
+  admin: ReturnType<typeof createClient>,
+  publicClient: ReturnType<typeof createClient>,
+  authUserId: string,
+  profile: { id_usuario: string; is_admin: boolean },
+): Promise<Response> {
+  const { data: authUser } = await admin.auth.admin.getUserById(authUserId);
+  const email = authUser?.user?.email;
+  if (!email) {
+    return respond(500, { error: "server_error" });
+  }
+
+  const { data: link, error: linkError } = await admin.auth.admin.generateLink({
+    type: "magiclink",
+    email,
+  });
+  const tokenHash = link?.properties?.hashed_token;
+  if (linkError || !tokenHash) {
+    return respond(500, { error: "server_error" });
+  }
+
+  const { data: session, error: verifyError } = await publicClient.auth.verifyOtp({
+    type: "magiclink",
+    token_hash: tokenHash,
+  });
+  if (verifyError || !session.session) {
+    return respond(500, { error: "server_error" });
+  }
+
+  return respond(200, {
+    access_token: session.session.access_token,
+    refresh_token: session.session.refresh_token,
+    id_usuario: profile.id_usuario,
+    is_admin: profile.is_admin === true,
+  });
+}

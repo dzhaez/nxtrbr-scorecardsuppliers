@@ -21,8 +21,9 @@ export interface EntraExchangeResult {
 
 /**
  * Trades a Microsoft Entra ID token for a Supabase session. The server validates
- * the token signature and only admits employee IDs present in the purchasing
- * spreadsheet, so the browser never handles passwords or account e-mails.
+ * the token signature and only admits users whose Entra identity is linked to
+ * an existing account or pre-authorized as an admin. The purchasing spreadsheet
+ * is no longer used for authorization.
  */
 export async function exchangeEntraToken(idToken: string): Promise<EntraExchangeResult> {
   const res = await fetch(`${supabaseUrl}/functions/v1/entra-exchange`, {
