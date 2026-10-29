@@ -1,13 +1,9 @@
 {
   "projectId": "69677688",
   "functions": {
-    "auth-broker": {
-      "hasChanged": false,
-      "hash": "96f4870f6fe732df3a1f2757d5c39c2b51e989d78a5042258f7ce34c21cd5bce"
-    },
     "entra-exchange": {
       "hasChanged": false,
-      "hash": "5656ed2538546c5941da2721b7e788b0c5d9830bb5d790c8d8c901959863eda2"
+      "hash": "bd2cb4a726174b4f84bb84dc312b44c61a70b5189659cab814712f560813c325"
     }
   }
 }

@@ -3,8 +3,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Upload, FileSpreadsheet, ArrowLeft, Loader2, CheckCircle2, AlertCircle, History, BarChart3 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Upload, FileSpreadsheet, ArrowLeft, Loader2, CheckCircle2, AlertCircle, History, BarChart3, Shield, UserPlus, Trash2 } from 'lucide-react';
 import { supabase, gerarCiclo, type Importacao, type Acesso } from '@/lib/supabase';
+import { setting } from '@/lib/config';
 
 import { useI18n } from '@/i18n/LanguageContext';
 const ManagementPanel = lazy(() => import('./ManagementPanel'));
@@ -23,6 +26,24 @@ interface ParsedRow {
   owner: string;
 }
 
+interface AdminAuthorization {
+  entra_tenant_id: string;
+  entra_oid: string;
+  entra_display_name: string | null;
+  authorized_by: string | null;
+  created_at: string;
+}
+
+interface AuditEntry {
+  id: string;
+  action: string;
+  target_oid: string;
+  target_tenant_id: string;
+  actor_id: string | null;
+  actor_id_usuario: string | null;
+  created_at: string;
+}
+
 export default function AdminScreen({ onBack }: AdminScreenProps) {
   const { t, locale } = useI18n();
   const [file, setFile] = useState<File | null>(null);
@@ -35,6 +56,15 @@ export default function AdminScreen({ onBack }: AdminScreenProps) {
   const [showHistory, setShowHistory] = useState(false);
   const [currentCiclo, setCurrentCiclo] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const [adminAuths, setAdminAuths] = useState<AdminAuthorization[]>([]);
+  const [auditEntries, setAuditEntries] = useState<AuditEntry[]>([]);
+  const [newAdminOid, setNewAdminOid] = useState('');
+  const [newAdminName, setNewAdminName] = useState('');
+  const [adminBusy, setAdminBusy] = useState(false);
+  const [adminMsg, setAdminMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  const entraTenantId = setting('VITE_ENTRA_TENANT_ID');
 
   const loadCicloAtual = useCallback(async () => {
     const { data } = await supabase
@@ -67,6 +97,76 @@ export default function AdminScreen({ onBack }: AdminScreenProps) {
       .limit(200);
     setAcessos(data || []);
   }, []);
+
+  const loadAdminAuths = useCallback(async () => {
+    const { data, error } = await supabase.rpc('list_admin_authorizations');
+    if (error) {
+      console.error('Failed to load admin authorizations:', error);
+      return;
+    }
+    setAdminAuths((data as AdminAuthorization[]) || []);
+  }, []);
+
+  const loadAuditLog = useCallback(async () => {
+    const { data, error } = await supabase.rpc('list_admin_audit_log', { p_limit: 100 });
+    if (error) {
+      console.error('Failed to load audit log:', error);
+      return;
+    }
+    setAuditEntries((data as AuditEntry[]) || []);
+  }, []);
+
+  async function handleAddAdmin() {
+    if (!newAdminOid.trim()) return;
+    setAdminBusy(true);
+    setAdminMsg(null);
+    try {
+      const { error } = await supabase.rpc('add_admin_authorization', {
+        p_tenant: entraTenantId,
+        p_oid: newAdminOid.trim(),
+        p_display_name: newAdminName.trim() || null,
+      });
+      if (error) throw error;
+      setAdminMsg({ type: 'success', text: t.adminAdded });
+      setNewAdminOid('');
+      setNewAdminName('');
+      await loadAdminAuths();
+      await loadAuditLog();
+    } catch (err) {
+      console.error('Failed to add admin:', err);
+      setAdminMsg({ type: 'error', text: t.adminAddError });
+    } finally {
+      setAdminBusy(false);
+    }
+  }
+
+  async function handleRemoveAdmin(oid: string, name: string | null) {
+    if (!confirm(t.removeAdminConfirm)) return;
+    setAdminBusy(true);
+    setAdminMsg(null);
+    try {
+      const { error } = await supabase.rpc('remove_admin_authorization', {
+        p_tenant: entraTenantId,
+        p_oid: oid,
+      });
+      if (error) {
+        if (error.message.includes('cannot_remove_last_admin')) {
+          setAdminMsg({ type: 'error', text: t.cannotRemoveLastAdmin });
+        } else {
+          throw error;
+        }
+      } else {
+        setAdminMsg({ type: 'success', text: t.adminRemoved });
+        await loadAdminAuths();
+        await loadAuditLog();
+      }
+    } catch (err) {
+      console.error('Failed to remove admin:', err);
+      setAdminMsg({ type: 'error', text: t.adminRemoveError });
+    } finally {
+      setAdminBusy(false);
+    }
+  }
 
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
@@ -224,13 +324,19 @@ export default function AdminScreen({ onBack }: AdminScreenProps) {
       </header>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-        <Tabs defaultValue="painel" className="w-full" onValueChange={(v) => { if (v === 'acessos') loadAcessos(); }}>
-          <TabsList className="grid w-full grid-cols-3 max-w-md mb-6">
+        <Tabs defaultValue="painel" className="w-full" onValueChange={(v) => {
+          if (v === 'acessos') loadAcessos();
+          if (v === 'admins') { loadAdminAuths(); loadAuditLog(); }
+        }}>
+          <TabsList className="grid w-full grid-cols-4 max-w-lg mb-6">
             <TabsTrigger value="painel">
               <BarChart3 className="w-4 h-4 mr-2" /> {t.panel}
             </TabsTrigger>
             <TabsTrigger value="importar">
               <Upload className="w-4 h-4 mr-2" /> {t.import}
+            </TabsTrigger>
+            <TabsTrigger value="admins">
+              <Shield className="w-4 h-4 mr-2" /> {t.admins}
             </TabsTrigger>
             <TabsTrigger value="acessos">
               <History className="w-4 h-4 mr-2" /> {t.accesses}
@@ -370,6 +476,162 @@ export default function AdminScreen({ onBack }: AdminScreenProps) {
                       <p className="text-xs text-muted-foreground text-center">
                         {importProgress.step} — {importProgress.current}/{importProgress.total}
                       </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="admins">
+            <div className="grid gap-6">
+              <Card className="brand-card shadow-lg animate-slide-up">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Shield className="w-5 h-5 text-primary" />
+                    {t.admins}
+                  </CardTitle>
+                  <CardDescription>{t.adminsDesc}</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {adminMsg && (
+                    <div className={`flex items-start gap-2 p-3 rounded-lg text-sm animate-fade-in ${
+                      adminMsg.type === 'success'
+                        ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400'
+                        : 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400'
+                    }`}>
+                      {adminMsg.type === 'success'
+                        ? <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
+                        : <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />}
+                      <span>{adminMsg.text}</span>
+                    </div>
+                  )}
+
+                  <div className="rounded-lg border border-border p-4 space-y-3">
+                    <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                      <UserPlus className="w-4 h-4 text-primary" /> {t.addByOid}
+                    </div>
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <Label className="text-xs">{t.objectId}</Label>
+                        <Input
+                          value={newAdminOid}
+                          onChange={(e) => setNewAdminOid(e.target.value)}
+                          placeholder={t.adminOidPlaceholder}
+                          className="font-mono text-xs"
+                        />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label className="text-xs">{t.adminDisplayName}</Label>
+                        <Input
+                          value={newAdminName}
+                          onChange={(e) => setNewAdminName(e.target.value)}
+                          placeholder={t.adminDisplayNamePlaceholder}
+                        />
+                      </div>
+                    </div>
+                    <Button
+                      onClick={handleAddAdmin}
+                      disabled={!newAdminOid.trim() || adminBusy}
+                      className="w-full"
+                    >
+                      {adminBusy ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <UserPlus className="w-4 h-4 mr-2" />}
+                      {t.addAdminButton}
+                    </Button>
+                  </div>
+
+                  {adminAuths.length === 0 ? (
+                    <p className="text-center text-muted-foreground py-8">{t.noAdminsRegistered}</p>
+                  ) : (
+                    <div className="rounded-lg border border-border overflow-hidden">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>{t.adminDisplayName}</TableHead>
+                            <TableHead>{t.objectId}</TableHead>
+                            <TableHead>{t.authorizedAt}</TableHead>
+                            <TableHead className="text-right">{t.removeAdmin}</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {adminAuths.map((a) => (
+                            <TableRow key={a.entra_oid}>
+                              <TableCell className="font-medium">{a.entra_display_name || '—'}</TableCell>
+                              <TableCell className="font-mono text-xs">{a.entra_oid.substring(0, 8)}…</TableCell>
+                              <TableCell className="text-xs">
+                                {new Date(a.created_at).toLocaleDateString(locale)}
+                              </TableCell>
+                              <TableCell className="text-right">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleRemoveAdmin(a.entra_oid, a.entra_display_name)}
+                                  disabled={adminBusy}
+                                  className="text-destructive hover:text-destructive"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card className="brand-card shadow-lg animate-slide-up">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <History className="w-5 h-5 text-primary" />
+                    {t.auditLog}
+                  </CardTitle>
+                  <CardDescription>{t.auditLogDesc}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {auditEntries.length === 0 ? (
+                    <p className="text-center text-muted-foreground py-8">{t.noAuditEntries}</p>
+                  ) : (
+                    <div className="rounded-lg border border-border overflow-hidden">
+                      <div className="max-h-[400px] overflow-auto">
+                        <Table>
+                          <TableHeader className="sticky top-0 bg-background">
+                            <TableRow>
+                              <TableHead>{t.auditAction}</TableHead>
+                              <TableHead>{t.auditTarget}</TableHead>
+                              <TableHead>{t.auditActor}</TableHead>
+                              <TableHead className="text-right">{t.auditDate}</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {auditEntries.map((e) => (
+                              <TableRow key={e.id}>
+                                <TableCell>
+                                  <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-medium ${
+                                    e.action === 'grant'
+                                      ? 'bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400'
+                                      : 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400'
+                                  }`}>
+                                    {e.action === 'grant' ? t.grant : t.revoke}
+                                  </span>
+                                </TableCell>
+                                <TableCell className="font-mono text-xs">{e.target_oid.substring(0, 8)}…</TableCell>
+                                <TableCell className="text-xs">{e.actor_id_usuario || '—'}</TableCell>
+                                <TableCell className="text-right text-xs">
+                                  {new Date(e.created_at).toLocaleString(locale, {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                  })}
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
                     </div>
                   )}
                 </CardContent>

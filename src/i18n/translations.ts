@@ -293,6 +293,37 @@ export interface Translation {
   noSuppliersForUser: string;
   noSuppliersMatchSearch: string;
   loadingSuppliers: string;
+
+  // Admin management
+  admins: string;
+  adminsDesc: string;
+  addAdmin: string;
+  adminOidPlaceholder: string;
+  adminDisplayName: string;
+  adminDisplayNamePlaceholder: string;
+  addAdminButton: string;
+  removeAdmin: string;
+  removeAdminConfirm: string;
+  noAdminsRegistered: string;
+  adminAdded: string;
+  adminRemoved: string;
+  adminAddError: string;
+  adminRemoveError: string;
+  cannotRemoveLastAdmin: string;
+  objectId: string;
+  authorizedBy: string;
+  authorizedAt: string;
+  auditLog: string;
+  auditLogDesc: string;
+  noAuditEntries: string;
+  auditAction: string;
+  auditTarget: string;
+  auditActor: string;
+  auditDate: string;
+  grant: string;
+  revoke: string;
+  selectExistingUser: string;
+  addByOid: string;
 }
 
 const pt: Translation = {
@@ -553,6 +584,36 @@ const pt: Translation = {
   noSuppliersForUser: 'Nenhum fornecedor encontrado para este usuário.',
   noSuppliersMatchSearch: 'Nenhum fornecedor corresponde à pesquisa.',
   loadingSuppliers: 'Carregando fornecedores...',
+
+  admins: 'Administradores',
+  adminsDesc: 'Gerenciar quem tem acesso administrativo ao sistema',
+  addAdmin: 'Adicionar Administrador',
+  adminOidPlaceholder: 'Object ID do Entra (GUID)',
+  adminDisplayName: 'Nome de exibição',
+  adminDisplayNamePlaceholder: 'Nome da pessoa',
+  addAdminButton: 'Autorizar',
+  removeAdmin: 'Remover',
+  removeAdminConfirm: 'Confirma a remoção deste administrador?',
+  noAdminsRegistered: 'Nenhum administrador autorizado.',
+  adminAdded: 'Administrador autorizado com sucesso.',
+  adminRemoved: 'Administrador removido com sucesso.',
+  adminAddError: 'Erro ao autorizar administrador.',
+  adminRemoveError: 'Erro ao remover administrador.',
+  cannotRemoveLastAdmin: 'Não é possível remover o último administrador ativo.',
+  objectId: 'Object ID',
+  authorizedBy: 'Autorizado por',
+  authorizedAt: 'Autorizado em',
+  auditLog: 'Auditoria de Administradores',
+  auditLogDesc: 'Registro de concessões e revogações de acesso administrativo',
+  noAuditEntries: 'Nenhuma entrada de auditoria.',
+  auditAction: 'Ação',
+  auditTarget: 'Alvo',
+  auditActor: 'Autor',
+  auditDate: 'Data',
+  grant: 'Conceder',
+  revoke: 'Revogar',
+  selectExistingUser: 'Selecionar usuário existente',
+  addByOid: 'Cadastrar por Object ID',
 };
 
 const en: Translation = {
@@ -813,6 +874,36 @@ const en: Translation = {
   noSuppliersForUser: 'No suppliers found for this user.',
   noSuppliersMatchSearch: 'No suppliers match the search.',
   loadingSuppliers: 'Loading suppliers...',
+
+  admins: 'Administrators',
+  adminsDesc: 'Manage who has administrative access to the system',
+  addAdmin: 'Add Administrator',
+  adminOidPlaceholder: 'Entra Object ID (GUID)',
+  adminDisplayName: 'Display name',
+  adminDisplayNamePlaceholder: 'Person name',
+  addAdminButton: 'Authorize',
+  removeAdmin: 'Remove',
+  removeAdminConfirm: 'Confirm removal of this administrator?',
+  noAdminsRegistered: 'No administrators authorized.',
+  adminAdded: 'Administrator authorized successfully.',
+  adminRemoved: 'Administrator removed successfully.',
+  adminAddError: 'Error authorizing administrator.',
+  adminRemoveError: 'Error removing administrator.',
+  cannotRemoveLastAdmin: 'Cannot remove the last active administrator.',
+  objectId: 'Object ID',
+  authorizedBy: 'Authorized by',
+  authorizedAt: 'Authorized at',
+  auditLog: 'Admin Audit Log',
+  auditLogDesc: 'Record of admin access grants and revocations',
+  noAuditEntries: 'No audit entries.',
+  auditAction: 'Action',
+  auditTarget: 'Target',
+  auditActor: 'Actor',
+  auditDate: 'Date',
+  grant: 'Grant',
+  revoke: 'Revoke',
+  selectExistingUser: 'Select existing user',
+  addByOid: 'Add by Object ID',
 };
 
 const pl: Translation = {
@@ -1073,6 +1164,36 @@ const pl: Translation = {
   noSuppliersForUser: 'Nie znaleziono dostawców dla tego użytkownika.',
   noSuppliersMatchSearch: 'Żaden dostawca nie pasuje do wyszukiwania.',
   loadingSuppliers: 'Ładowanie dostawców...',
+
+  admins: 'Administratorzy',
+  adminsDesc: 'Zarządzaj kto ma dostęp administracyjny do systemu',
+  addAdmin: 'Dodaj Administratora',
+  adminOidPlaceholder: 'Object ID Entra (GUID)',
+  adminDisplayName: 'Nazwa wyświetlana',
+  adminDisplayNamePlaceholder: 'Imię osoby',
+  addAdminButton: 'Autoryzuj',
+  removeAdmin: 'Usuń',
+  removeAdminConfirm: 'Potwierdzasz usunięcie tego administratora?',
+  noAdminsRegistered: 'Brak autoryzowanych administratorów.',
+  adminAdded: 'Administrator autoryzowany pomyślnie.',
+  adminRemoved: 'Administrator usunięty pomyślnie.',
+  adminAddError: 'Błąd autoryzacji administratora.',
+  adminRemoveError: 'Błąd usuwania administratora.',
+  cannotRemoveLastAdmin: 'Nie można usunąć ostatniego aktywnego administratora.',
+  objectId: 'Object ID',
+  authorizedBy: 'Autoryzowany przez',
+  authorizedAt: 'Autoryzowany w',
+  auditLog: 'Dziennik Audytu Administratorów',
+  auditLogDesc: 'Rejestr nadawania i odbierania dostępu administracyjnego',
+  noAuditEntries: 'Brak wpisów audytu.',
+  auditAction: 'Akcja',
+  auditTarget: 'Cel',
+  auditActor: 'Autor',
+  auditDate: 'Data',
+  grant: 'Nadaj',
+  revoke: 'Cofnij',
+  selectExistingUser: 'Wybierz istniejącego użytkownika',
+  addByOid: 'Dodaj przez Object ID',
 };
 
 const es: Translation = {
@@ -1333,6 +1454,36 @@ const es: Translation = {
   noSuppliersForUser: 'No se encontraron proveedores para este usuario.',
   noSuppliersMatchSearch: 'Ningún proveedor coincide con la búsqueda.',
   loadingSuppliers: 'Cargando proveedores...',
+
+  admins: 'Administradores',
+  adminsDesc: 'Gestionar quién tiene acceso administrativo al sistema',
+  addAdmin: 'Añadir Administrador',
+  adminOidPlaceholder: 'Object ID de Entra (GUID)',
+  adminDisplayName: 'Nombre para mostrar',
+  adminDisplayNamePlaceholder: 'Nombre de la persona',
+  addAdminButton: 'Autorizar',
+  removeAdmin: 'Eliminar',
+  removeAdminConfirm: '¿Confirma la eliminación de este administrador?',
+  noAdminsRegistered: 'Ningún administrador autorizado.',
+  adminAdded: 'Administrador autorizado correctamente.',
+  adminRemoved: 'Administrador eliminado correctamente.',
+  adminAddError: 'Error al autorizar administrador.',
+  adminRemoveError: 'Error al eliminar administrador.',
+  cannotRemoveLastAdmin: 'No se puede eliminar el último administrador activo.',
+  objectId: 'Object ID',
+  authorizedBy: 'Autorizado por',
+  authorizedAt: 'Autorizado el',
+  auditLog: 'Auditoría de Administradores',
+  auditLogDesc: 'Registro de concesiones y revocaciones de acceso administrativo',
+  noAuditEntries: 'Ninguna entrada de auditoría.',
+  auditAction: 'Acción',
+  auditTarget: 'Objetivo',
+  auditActor: 'Autor',
+  auditDate: 'Fecha',
+  grant: 'Conceder',
+  revoke: 'Revocar',
+  selectExistingUser: 'Seleccionar usuario existente',
+  addByOid: 'Añadir por Object ID',
 };
 
 export const translations: Record<LanguageCode, Translation> = { pt, en, pl, es };
