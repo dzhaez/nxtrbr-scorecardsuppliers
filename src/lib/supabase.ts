@@ -39,7 +39,7 @@ export async function exchangeEntraToken(idToken: string): Promise<EntraExchange
   if (!res.ok) {
     const failure = await res.json().catch(() => null);
     const code = typeof failure?.error === 'string' && /^[a-z_]{1,80}$/.test(failure.error) ? failure.error : 'unknown';
-    throw new Error('entra_exchange_failed (' + res.status + '): ' + code + (typeof failure?.diagnostic_code === 'string' ? ' [' + failure.diagnostic_code + '] ' + String(failure.diagnostic_message ?? '').slice(0,200) : ''));
+    throw new Error(`entra_exchange_failed (${res.status}): ${code}`);
   }
 
   const data = await res.json();
