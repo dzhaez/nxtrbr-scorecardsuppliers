@@ -51,7 +51,6 @@ function createMsal(client: string): PublicClientApplication {
       postLogoutRedirectUri: window.location.origin,
     },
     cache: { cacheLocation: 'sessionStorage' },
-    system: { asyncPopups: true, loggerOptions: { loggerCallback: (_level, message, containsPii) => { if (!containsPii && message.includes('error opening popup')) console.warn(message); }, piiLoggingEnabled: false } },
   });
 }
 
