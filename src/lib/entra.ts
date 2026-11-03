@@ -52,7 +52,8 @@ function isEmbedded(): boolean {
 
 let redirectResult: Promise<string | null> | null = null;
 
-// Process each redirect once, including React StrictMode remounts.
+// Process redirect response (non-embedded only). In embedded mode the popup
+// flow returns the token directly from startEntraSignIn, so this is a no-op.
 export function handleEntraRedirect(): Promise<string | null> {
   if (isDevMode || !clientId || isEmbedded()) return Promise.resolve(null);
   redirectResult ??= (async () => {
@@ -70,21 +71,47 @@ export function handleEntraRedirect(): Promise<string | null> {
   return redirectResult;
 }
 
-// Leave the editor iframe in the SAME browser tab before Microsoft sign-in.
-export async function startEntraSignIn(): Promise<void> {
-  if (isDevMode) return;
+// In embedded mode (Bolt preview iframe), uses loginPopup so the editor tab
+// is never navigated away. Returns the idToken from the popup response, or
+// null when the non-embedded redirect flow takes over (browser navigates to
+// Microsoft and back).
+export async function startEntraSignIn(): Promise<string | null> {
+  if (isDevMode) return null;
   if (isEmbedded()) {
-    const url = new URL('https://it-ea-app-scorecard-suppliers-0b9ddd.azurewebsites.net/');
-    url.searchParams.set('entra_login', '1');
-    window.top!.location.href = url.href;
-    return;
+    const msal = await getMsal();
+    const response = await msal.loginPopup({
+      scopes: resolvedScopes(),
+      popupWindowAttributes: {
+        popupSize: { width: 500, height: 600 },
+        popupPosition: { top: 100, left: 200 },
+      },
+    });
+    return response?.idToken ?? null;
   }
   const msal = await getMsal();
   await msal.loginRedirect({ scopes: resolvedScopes() });
+  return null;
 }
 
 export async function signOutOfEntra(): Promise<void> {
   if (isDevMode) return;
   const msal = await getMsal();
+  if (isEmbedded()) {
+    // logoutPopup opens a small window to Microsoft's end-session endpoint,
+    // then redirects it back to postLogoutRedirectUri. post_logout_redirect_uri
+    // does not need to be registered in the app registration (unlike the auth
+    // redirect URI), so this works regardless of Entra redirect URI config.
+    try {
+      await msal.logoutPopup({
+        postLogoutRedirectUri: window.location.origin,
+        popupWindowAttributes: {
+          popupSize: { width: 500, height: 600 },
+        },
+      });
+    } catch {
+      msal.clearCache();
+    }
+    return;
+  }
   await msal.logoutRedirect({ postLogoutRedirectUri: window.location.origin });
 }

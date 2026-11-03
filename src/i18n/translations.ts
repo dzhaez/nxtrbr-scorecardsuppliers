@@ -45,6 +45,8 @@ export interface Translation {
   entraIframeTitle: string;
   entraIframeDesc: string;
   openInNewTab: string;
+  entraPopupBlocked: string;
+  entraPopupCancelled: string;
   devModeButton: string;
   firstAccessError: string;
   idAlreadyRegistered: string;
@@ -359,6 +361,8 @@ const pt: Translation = {
   entraIframeTitle: 'Abra a aplicação em uma aba separada',
   entraIframeDesc: 'A janela de login não pode abrir aqui. Abra a aplicação em uma nova aba para fazer login com a Microsoft.',
   openInNewTab: 'Abrir em nova aba',
+  entraPopupBlocked: 'O popup de login foi bloqueado pelo navegador. Permita popups para este site e tente novamente.',
+  entraPopupCancelled: 'O login foi cancelado. Tente novamente quando quiser.',
   devModeButton: 'Entrar em modo desenvolvimento',
   firstAccessError: 'Não foi possível cadastrar. Verifique os dados e tente novamente.',
   idAlreadyRegistered: 'Este ID já está cadastrado no sistema.',
@@ -652,6 +656,8 @@ const en: Translation = {
   entraIframeTitle: 'Open the app in a separate tab',
   entraIframeDesc: 'The login window cannot open here. Open the app in a new tab to sign in with Microsoft.',
   openInNewTab: 'Open in new tab',
+  entraPopupBlocked: 'The login popup was blocked by the browser. Please allow popups for this site and try again.',
+  entraPopupCancelled: 'Sign-in was cancelled. Please try again when ready.',
   devModeButton: 'Sign in (dev mode)',
   firstAccessError: 'Could not register. Please check your details and try again.',
   idAlreadyRegistered: 'This ID is already registered in the system.',
@@ -945,6 +951,8 @@ const pl: Translation = {
   entraIframeTitle: 'Otwórz aplikację w osobnej karcie',
   entraIframeDesc: 'Okno logowania nie może zostać otwarte tutaj. Otwórz aplikację w nowej karcie, aby się zalogować.',
   openInNewTab: 'Otwórz w nowej karcie',
+  entraPopupBlocked: 'Wyskakujące okienko logowania zostało zablokowane przez przeglądarkę. Zezwól na wyskakujące okienka dla tej witryny i spróbuj ponownie.',
+  entraPopupCancelled: 'Logowanie zostało anulowane. Spróbuj ponownie, gdy będziesz gotowy.',
   devModeButton: 'Zaloguj (tryb deweloperski)',
   firstAccessError: 'Nie udało się zarejestrować. Sprawdź dane i spróbuj ponownie.',
   idAlreadyRegistered: 'To ID jest już zarejestrowane w systemie.',
@@ -1238,6 +1246,8 @@ const es: Translation = {
   entraIframeTitle: 'Abra la aplicación en una pestaña separada',
   entraIframeDesc: 'La ventana de inicio de sesión no puede abrirse aquí. Abra la aplicación en una nueva pestaña para iniciar sesión.',
   openInNewTab: 'Abrir en nueva pestaña',
+  entraPopupBlocked: 'La ventana emergente de inicio de sesión fue bloqueada por el navegador. Permita ventanas emergentes para este sitio e inténtelo de nuevo.',
+  entraPopupCancelled: 'El inicio de sesión fue cancelado. Inténtelo de nuevo cuando esté listo.',
   devModeButton: 'Iniciar sesión (modo desarrollo)',
   firstAccessError: 'No se pudo registrar. Verifique los datos e intente nuevamente.',
   idAlreadyRegistered: 'Este ID ya está registrado en el sistema.',
