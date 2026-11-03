@@ -17,11 +17,12 @@ const EvaluationForm = lazy(() => import('./EvaluationForm'));
 
 interface MainScreenProps {
   userId: string;
+  userEmail: string;
   isAdmin: boolean;
   onLogout: () => void;
 }
 
-export default function MainScreen({ userId, isAdmin, onLogout }: MainScreenProps) {
+export default function MainScreen({ userId, userEmail, isAdmin, onLogout }: MainScreenProps) {
   const { t } = useI18n();
   const [suppliers, setSuppliers] = useState<SupplierWithOrders[]>([]);
   const [loading, setLoading] = useState(true);
@@ -260,7 +261,7 @@ export default function MainScreen({ userId, isAdmin, onLogout }: MainScreenProp
                 Scorecard Indirect Suppliers
               </h1>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <span className="font-medium text-foreground/80">{userId}</span>
+                <span className="font-medium text-foreground/80">{userEmail || userId}</span>
                 {currentCiclo && <span>· {t.cycle} {currentCiclo}</span>}
               </div>
             </div>

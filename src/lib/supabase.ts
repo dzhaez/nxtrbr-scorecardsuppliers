@@ -13,10 +13,12 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 });
 
 export class EntraAccessDeniedError extends Error {}
+export class EntraIdConflictError extends Error {}
 
 export interface EntraExchangeResult {
   id_usuario: string;
   is_admin: boolean;
+  email: string;
 }
 
 /**
@@ -36,6 +38,7 @@ export async function exchangeEntraToken(idToken: string): Promise<EntraExchange
     body: JSON.stringify({ id_token: idToken }),
   });
   if (res.status === 403) throw new EntraAccessDeniedError('not_authorized');
+  if (res.status === 409) throw new EntraIdConflictError('id_usuario_conflict');
   if (!res.ok) {
     const failure = await res.json().catch(() => null);
     const code = typeof failure?.error === 'string' && /^[a-z_]{1,80}$/.test(failure.error) ? failure.error : 'unknown';
@@ -53,7 +56,11 @@ export async function exchangeEntraToken(idToken: string): Promise<EntraExchange
   });
   if (error) throw error;
 
-  return { id_usuario: data.id_usuario, is_admin: data.is_admin === true };
+  return {
+    id_usuario: data.id_usuario,
+    is_admin: data.is_admin === true,
+    email: typeof data.email === 'string' ? data.email : '',
+  };
 }
 
 export interface Importacao {
@@ -118,6 +125,7 @@ export interface Usuario {
   id: string;
   id_usuario: string;
   is_admin: boolean;
+  email: string;
   created_at: string;
 }
 
@@ -177,6 +185,7 @@ export async function fetchUserProfile(): Promise<Usuario | null> {
     id: userRes.data.user.id,
     id_usuario: idRes.data as string,
     is_admin: (adminRes.data as boolean) ?? false,
+    email: userRes.data.user.email ?? '',
     created_at: userRes.data.user.created_at ?? '',
   };
 }

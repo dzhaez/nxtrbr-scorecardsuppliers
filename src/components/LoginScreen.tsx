@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { AlertCircle, Loader2, Globe, ShieldCheck } from 'lucide-react';
-import { exchangeEntraToken, registrarAcesso, EntraAccessDeniedError } from '@/lib/supabase';
+import { exchangeEntraToken, registrarAcesso, EntraAccessDeniedError, EntraIdConflictError } from '@/lib/supabase';
 import {
   startEntraSignIn,
   handleEntraRedirect,
@@ -13,7 +13,7 @@ import { useI18n } from '@/i18n/LanguageContext';
 import { LANGUAGES, type LanguageCode } from '@/i18n/translations';
 
 interface LoginScreenProps {
-  onLogin: (userId: string, isAdmin: boolean) => void;
+  onLogin: (userId: string, isAdmin: boolean, email: string) => void;
 }
 
 export default function LoginScreen({ onLogin }: LoginScreenProps) {
@@ -26,12 +26,18 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
   async function finishSignIn(idToken: string) {
     setStatus('verifying');
     try {
-      const { id_usuario, is_admin } = await exchangeEntraToken(idToken);
+      const { id_usuario, is_admin, email } = await exchangeEntraToken(idToken);
       await registrarAcesso(id_usuario);
-      onLogin(id_usuario, is_admin);
+      onLogin(id_usuario, is_admin, email);
     } catch (err) {
       console.error('Entra sign-in failed:', err);
-      setError(err instanceof EntraAccessDeniedError ? t.entraNotAuthorized : t.entraError);
+      if (err instanceof EntraIdConflictError) {
+        setError(t.entraIdConflict);
+      } else if (err instanceof EntraAccessDeniedError) {
+        setError(t.entraNotAuthorized);
+      } else {
+        setError(t.entraError);
+      }
       setStatus('idle');
     }
   }
@@ -70,7 +76,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
   }
 
   function handleDevMode() {
-    onLogin('dev-user', true);
+    onLogin('dev-user', true, 'dev@localhost');
   }
 
   function selectLanguage(code: LanguageCode) {

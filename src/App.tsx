@@ -25,6 +25,7 @@ function AppInner() {
   const { t } = useI18n();
   const [screen, setScreen] = useState<Screen>('login');
   const [userId, setUserId] = useState('');
+  const [userEmail, setUserEmail] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
   const [authReady, setAuthReady] = useState(false);
   const authReadyRef = useRef(false);
@@ -78,6 +79,7 @@ function AppInner() {
 
         if (profile) {
           setUserId(profile.id_usuario);
+          setUserEmail(profile.email);
           setIsAdmin(profile.is_admin);
           setScreen('main');
         } else {
@@ -115,8 +117,9 @@ function AppInner() {
     };
   }, []);
 
-  function handleLogin(id: string, admin: boolean) {
+  function handleLogin(id: string, admin: boolean, email: string) {
     setUserId(id);
+    setUserEmail(email);
     setIsAdmin(admin);
     setScreen('main');
   }
@@ -125,6 +128,7 @@ function AppInner() {
     await supabase.auth.signOut();
     await signOutOfEntra();
     setUserId('');
+    setUserEmail('');
     setIsAdmin(false);
     setScreen('login');
   }
@@ -162,7 +166,7 @@ function AppInner() {
 
   return (
     <Suspense fallback={<FullScreenLoader />}>
-      <MainScreen userId={userId} isAdmin={isAdmin} onLogout={handleLogout} />
+      <MainScreen userId={userId} userEmail={userEmail} isAdmin={isAdmin} onLogout={handleLogout} />
     </Suspense>
   );
 }

@@ -41,6 +41,7 @@ export interface Translation {
   entraSignInButton: string;
   entraError: string;
   entraNotAuthorized: string;
+  entraIdConflict: string;
   entraNotConfigured: string;
   entraIframeTitle: string;
   entraIframeDesc: string;
@@ -355,6 +356,7 @@ const pt: Translation = {
   entraSignInButton: 'Entrar com Microsoft',
   entraError: 'Não foi possível entrar com sua conta Microsoft. Tente novamente.',
   entraNotAuthorized: 'Sua conta não tem acesso a este sistema. Procure o administrador.',
+  entraIdConflict: 'Já existe um usuário com este identificador vinculado a outra conta. Procure o administrador para resolver.',
   entraNotConfigured: 'O acesso com Microsoft ainda não foi configurado. Procure o suporte.',
   entraIframeTitle: 'Abra a aplicação em uma aba separada',
   entraIframeDesc: 'A janela de login não pode abrir aqui. Abra a aplicação em uma nova aba para fazer login com a Microsoft.',
@@ -648,6 +650,7 @@ const en: Translation = {
   entraSignInButton: 'Sign in with Microsoft',
   entraError: 'Could not sign in with your Microsoft account. Please try again.',
   entraNotAuthorized: 'Your account does not have access to this system. Contact your administrator.',
+  entraIdConflict: 'A user with this identifier is already linked to another account. Contact your administrator to resolve.',
   entraNotConfigured: 'Microsoft sign-in is not configured yet. Please contact support.',
   entraIframeTitle: 'Open the app in a separate tab',
   entraIframeDesc: 'The login window cannot open here. Open the app in a new tab to sign in with Microsoft.',
@@ -941,6 +944,7 @@ const pl: Translation = {
   entraSignInButton: 'Zaloguj się kontem Microsoft',
   entraError: 'Nie udało się zalogować kontem Microsoft. Spróbuj ponownie.',
   entraNotAuthorized: 'Twoje konto nie ma dostępu do tego systemu. Skontaktuj się z administratorem.',
+  entraIdConflict: 'Użytkownik z tym identyfikatorem jest już powiązany z innym kontem. Skontaktuj się z administratorem, aby to rozwiązać.',
   entraNotConfigured: 'Logowanie Microsoft nie jest jeszcze skonfigurowane. Skontaktuj się z pomocą techniczną.',
   entraIframeTitle: 'Otwórz aplikację w osobnej karcie',
   entraIframeDesc: 'Okno logowania nie może zostać otwarte tutaj. Otwórz aplikację w nowej karcie, aby się zalogować.',
@@ -1234,6 +1238,7 @@ const es: Translation = {
   entraSignInButton: 'Iniciar sesión con Microsoft',
   entraError: 'No se pudo iniciar sesión con su cuenta de Microsoft. Intente nuevamente.',
   entraNotAuthorized: 'Su cuenta no tiene acceso a este sistema. Contacte al administrador.',
+  entraIdConflict: 'Ya existe un usuario con este identificador vinculado a otra cuenta. Contacte al administrador para resolverlo.',
   entraNotConfigured: 'El acceso con Microsoft aún no está configurado. Contacte al soporte.',
   entraIframeTitle: 'Abra la aplicación en una pestaña separada',
   entraIframeDesc: 'La ventana de inicio de sesión no puede abrirse aquí. Abra la aplicación en una nueva pestaña para iniciar sesión.',
