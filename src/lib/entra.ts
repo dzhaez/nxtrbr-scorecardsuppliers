@@ -32,6 +32,15 @@ function createMsal(client: string): PublicClientApplication {
       navigateToLoginRequestUrl: false,
     },
     cache: { cacheLocation: 'sessionStorage' },
+    system: {
+      // When false (default), MSAL opens about:blank first, then calls
+      // popupWindow.location.assign(authUrl). In a credentialless iframe that
+      // cross-origin assignment fails and MSAL throws popup_window_error.
+      // asyncPopups: true makes MSAL call window.open(authUrl) directly,
+      // opening a fresh top-level window that is not constrained by the
+      // credentialless iframe policy.
+      asyncPopups: true,
+    },
   });
 }
 
