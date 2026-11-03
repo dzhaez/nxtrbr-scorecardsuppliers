@@ -74,7 +74,7 @@ export function handleEntraRedirect(): Promise<string | null> {
 export async function startEntraSignIn(): Promise<void> {
   if (isDevMode) return;
   if (isEmbedded()) {
-    const url = new URL('/', window.location.origin);
+    const url = new URL('https://it-ea-app-scorecard-suppliers-0b9ddd.azurewebsites.net/');
     url.searchParams.set('entra_login', '1');
     window.top!.location.href = url.href;
     return;
