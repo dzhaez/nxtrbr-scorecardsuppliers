@@ -8,6 +8,9 @@ const clientId = setting('VITE_ENTRA_CLIENT_ID');
 const authority = setting('VITE_ENTRA_AUTHORITY');
 const apiScope = setting('VITE_ENTRA_API_SCOPE');
 
+// Stable Azure portal — redirect URI is registered in the Entra app registration.
+const STABLE_PORTAL = 'https://it-ea-app-scorecard-suppliers-0b9ddd.azurewebsites.net/';
+
 export const isEntraConfigured = Boolean(tenantId && clientId) || isDevMode;
 
 function resolvedAuthority(): string {
@@ -32,15 +35,6 @@ function createMsal(client: string): PublicClientApplication {
       navigateToLoginRequestUrl: false,
     },
     cache: { cacheLocation: 'sessionStorage' },
-    system: {
-      // When false (default), MSAL opens about:blank first, then calls
-      // popupWindow.location.assign(authUrl). In a credentialless iframe that
-      // cross-origin assignment fails and MSAL throws popup_window_error.
-      // asyncPopups: true makes MSAL call window.open(authUrl) directly,
-      // opening a fresh top-level window that is not constrained by the
-      // credentialless iframe policy.
-      asyncPopups: true,
-    },
   });
 }
 
@@ -61,8 +55,10 @@ function isEmbedded(): boolean {
 
 let redirectResult: Promise<string | null> | null = null;
 
-// Process redirect response (non-embedded only). In embedded mode the popup
-// flow returns the token directly from startEntraSignIn, so this is a no-op.
+// Processes the redirect response on the stable portal (non-embedded).
+// Consumes and removes the entra_login=1 query parameter, then initiates
+// loginRedirect to Microsoft. The memoized promise survives React StrictMode
+// remounts so the redirect is only processed once.
 export function handleEntraRedirect(): Promise<string | null> {
   if (isDevMode || !clientId || isEmbedded()) return Promise.resolve(null);
   redirectResult ??= (async () => {
@@ -80,47 +76,32 @@ export function handleEntraRedirect(): Promise<string | null> {
   return redirectResult;
 }
 
-// In embedded mode (Bolt preview iframe), uses loginPopup so the editor tab
-// is never navigated away. Returns the idToken from the popup response, or
-// null when the non-embedded redirect flow takes over (browser navigates to
-// Microsoft and back).
-export async function startEntraSignIn(): Promise<string | null> {
-  if (isDevMode) return null;
+// In embedded mode (Bolt preview iframe), navigates the top-level browser tab
+// to the stable Azure portal with entra_login=1. The portal is a full-page
+// origin whose redirect URI is registered in Entra, so the redirect flow
+// completes normally. No popup, no window.open, no new tab — same tab only.
+// In non-embedded mode, initiates loginRedirect directly.
+export async function startEntraSignIn(): Promise<void> {
+  if (isDevMode) return;
   if (isEmbedded()) {
-    const msal = await getMsal();
-    const response = await msal.loginPopup({
-      scopes: resolvedScopes(),
-      popupWindowAttributes: {
-        popupSize: { width: 500, height: 600 },
-        popupPosition: { top: 100, left: 200 },
-      },
-    });
-    return response?.idToken ?? null;
+    const url = new URL(STABLE_PORTAL);
+    url.searchParams.set('entra_login', '1');
+    window.top!.location.href = url.href;
+    return;
   }
   const msal = await getMsal();
   await msal.loginRedirect({ scopes: resolvedScopes() });
-  return null;
 }
 
+// Logout: in embedded mode, navigates the top-level tab to the stable portal.
+// In non-embedded mode, uses logoutRedirect to Microsoft's end-session
+// endpoint, which redirects back to the portal after sign-out.
 export async function signOutOfEntra(): Promise<void> {
   if (isDevMode) return;
-  const msal = await getMsal();
   if (isEmbedded()) {
-    // logoutPopup opens a small window to Microsoft's end-session endpoint,
-    // then redirects it back to postLogoutRedirectUri. post_logout_redirect_uri
-    // does not need to be registered in the app registration (unlike the auth
-    // redirect URI), so this works regardless of Entra redirect URI config.
-    try {
-      await msal.logoutPopup({
-        postLogoutRedirectUri: window.location.origin,
-        popupWindowAttributes: {
-          popupSize: { width: 500, height: 600 },
-        },
-      });
-    } catch {
-      msal.clearCache();
-    }
+    window.top!.location.href = STABLE_PORTAL;
     return;
   }
+  const msal = await getMsal();
   await msal.logoutRedirect({ postLogoutRedirectUri: window.location.origin });
 }

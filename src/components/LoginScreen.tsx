@@ -53,33 +53,18 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Maps MSAL popup errors to user-facing messages.
-  function popupErrorMessage(err: unknown): string {
-    const msg = err instanceof Error ? err.message.toLowerCase() : '';
-    if (msg.includes('popup_window') || msg.includes('blocked') || msg.includes('popup')) {
-      return t.entraPopupBlocked;
-    }
-    if (msg.includes('cancel') || msg.includes('user_cancelled')) {
-      return t.entraPopupCancelled;
-    }
-    return t.entraError;
-  }
-
   async function handleSignIn() {
     setError('');
     setStatus('popup');
     try {
-      // In embedded mode, startEntraSignIn opens a popup and returns the
-      // idToken directly. In non-embedded mode it returns null after
-      // initiating a redirect (the useEffect above picks up the response).
-      const idToken = await startEntraSignIn();
-      if (idToken) {
-        await finishSignIn(idToken);
-      }
-      // If null (redirect flow): browser navigates away; nothing to do here.
+      // In embedded mode, navigates the top-level tab to the stable Azure
+      // portal with entra_login=1. In non-embedded mode, initiates
+      // loginRedirect to Microsoft. Either way, the browser navigates away;
+      // the redirect response is processed by handleEntraRedirect on return.
+      await startEntraSignIn();
     } catch (err) {
       console.error('Entra sign-in failed:', err);
-      setError(popupErrorMessage(err));
+      setError(t.entraError);
       setStatus('idle');
     }
   }
