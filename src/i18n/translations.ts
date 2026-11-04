@@ -210,6 +210,8 @@ export interface Translation {
   selectCycle: string;
   allCycles: string;
   cycleLabel: string;
+  cycleSelectLabel: string;
+  cycleDistribution: string;
   importDate: string;
   fileName: string;
   orderCount: string;
@@ -553,6 +555,8 @@ const pt: Translation = {
   cyclesTitle: 'Ciclos importados',
   cyclesDesc: 'Scorecard consolidado por ciclo. Abra um ciclo para ver os resultados das avaliações.',
   cyclesEmpty: 'Nenhum ciclo importado ainda.',
+  cycleSelectLabel: 'Ciclo a avaliar',
+  cycleDistribution: 'Classificação dos fornecedores',
   cyclesLoadError: 'Não foi possível carregar os ciclos. Tente atualizar a página.',
   cycleImportedOn: 'Importado em',
   cycleSuppliers: 'Fornecedores',
@@ -875,6 +879,8 @@ const en: Translation = {
   cyclesTitle: 'Imported cycles',
   cyclesDesc: 'Consolidated scorecard per cycle. Open a cycle to see the evaluation results.',
   cyclesEmpty: 'No cycles imported yet.',
+  cycleSelectLabel: 'Cycle to evaluate',
+  cycleDistribution: 'Supplier classification',
   cyclesLoadError: 'Could not load the cycles. Try refreshing the page.',
   cycleImportedOn: 'Imported on',
   cycleSuppliers: 'Suppliers',
@@ -1197,6 +1203,8 @@ const pl: Translation = {
   cyclesTitle: 'Zaimportowane cykle',
   cyclesDesc: 'Skonsolidowana karta wyników dla każdego cyklu. Otwórz cykl, aby zobaczyć wyniki ocen.',
   cyclesEmpty: 'Brak zaimportowanych cykli.',
+  cycleSelectLabel: 'Cykl do oceny',
+  cycleDistribution: 'Klasyfikacja dostawców',
   cyclesLoadError: 'Nie udało się załadować cykli. Odśwież stronę.',
   cycleImportedOn: 'Zaimportowano',
   cycleSuppliers: 'Dostawcy',
@@ -1519,6 +1527,8 @@ const es: Translation = {
   cyclesTitle: 'Ciclos importados',
   cyclesDesc: 'Scorecard consolidado por ciclo. Abra un ciclo para ver los resultados de las evaluaciones.',
   cyclesEmpty: 'Aún no hay ciclos importados.',
+  cycleSelectLabel: 'Ciclo a evaluar',
+  cycleDistribution: 'Clasificación de proveedores',
   cyclesLoadError: 'No se pudieron cargar los ciclos. Intente actualizar la página.',
   cycleImportedOn: 'Importado el',
   cycleSuppliers: 'Proveedores',

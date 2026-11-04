@@ -311,18 +311,21 @@ export default function MainScreen({ userId, userEmail, isAdmin, onLogout }: Mai
               className="pl-10 h-10"
             />
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-end gap-2">
             {ciclos.length > 0 && (
-              <Select value={selectedCiclo} onValueChange={setSelectedCiclo}>
-                <SelectTrigger className="w-44 h-10">
-                  <SelectValue placeholder={t.cycle} />
-                </SelectTrigger>
-                <SelectContent>
-                  {ciclos.map((c) => (
-                    <SelectItem key={c} value={c}>{t.cycle} {c}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex flex-col gap-1">
+                <span className="text-xs font-medium text-muted-foreground">{t.cycleSelectLabel}</span>
+                <Select value={selectedCiclo} onValueChange={setSelectedCiclo}>
+                  <SelectTrigger className="w-44 h-10" aria-label={t.cycleSelectLabel}>
+                    <SelectValue placeholder={t.cycle} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {ciclos.map((c) => (
+                      <SelectItem key={c} value={c}>{t.cycle} {c}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             )}
             <Select value={filterCommodity} onValueChange={setFilterCommodity}>
               <SelectTrigger className="w-40 h-10">

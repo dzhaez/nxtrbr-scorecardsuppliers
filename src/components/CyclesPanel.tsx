@@ -37,6 +37,7 @@ interface CycleSummary {
   totalFornecedores: number;
   avaliados: number;
   media: number | null;
+  medias: number[];
 }
 
 interface CyclesPanelProps {
@@ -44,8 +45,25 @@ interface CyclesPanelProps {
   onCycleRemoved: () => void;
 }
 
+type ClassLabels = { poor: string; good: string; excellent: string };
+
+function countByClassification(medias: number[], labels: ClassLabels) {
+  const counts = new Map<string, number>();
+  medias.forEach((m) => {
+    const { label } = classificacaoMedia(m, labels);
+    counts.set(label, (counts.get(label) ?? 0) + 1);
+  });
+  return counts;
+}
+
 export default function CyclesPanel({ onViewResults, onCycleRemoved }: CyclesPanelProps) {
   const { t, locale } = useI18n();
+  const classLabels: ClassLabels = { poor: t.classificationPoor, good: t.classificationGood, excellent: t.classificationExcellent };
+  const classLevels = [
+    classificacaoMedia(5, classLabels),
+    classificacaoMedia(3, classLabels),
+    classificacaoMedia(1, classLabels),
+  ];
   const [summaries, setSummaries] = useState<CycleSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadFailed, setLoadFailed] = useState(false);
@@ -94,6 +112,7 @@ export default function CyclesPanel({ onViewResults, onCycleRemoved }: CyclesPan
           totalFornecedores: suppliersByCiclo.get(c.ciclo)?.size ?? 0,
           avaliados: medias.length,
           media: media === null ? null : Math.round(media * 100) / 100,
+          medias,
         };
       }),
     );
@@ -154,6 +173,7 @@ export default function CyclesPanel({ onViewResults, onCycleRemoved }: CyclesPan
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {summaries.map((s) => {
             const progress = s.totalFornecedores > 0 ? Math.round((s.avaliados / s.totalFornecedores) * 100) : 0;
+            const counts = countByClassification(s.medias, classLabels);
             const classe = s.media === null
               ? null
               : classificacaoMedia(s.media, { poor: t.classificationPoor, good: t.classificationGood, excellent: t.classificationExcellent });
@@ -189,6 +209,17 @@ export default function CyclesPanel({ onViewResults, onCycleRemoved }: CyclesPan
                         <p className="text-lg font-semibold text-foreground">{s.media === null ? '-' : s.media.toFixed(2)}</p>
                         <p className="text-xs text-muted-foreground">{t.cycleAvgScore}</p>
                       </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="text-xs text-muted-foreground">{t.cycleDistribution}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {classLevels.map((level) => (
+                        <span key={level.label} className={`text-xs font-medium px-2.5 py-1 rounded-full ${level.bg} ${level.color}`}>
+                          {level.label}: {counts.get(level.label) ?? 0}
+                        </span>
+                      ))}
                     </div>
                   </div>
 
