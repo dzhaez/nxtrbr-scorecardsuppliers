@@ -163,6 +163,19 @@ export interface Translation {
   importStepOrders: string;
   importSuccess: string;
   importError: string;
+  importCycleDetected: string;
+  importCycleMissing: string;
+  noCyclesYet: string;
+  cycleHistory: string;
+  cycleHistoryDesc: string;
+  cycleHistoryButton: string;
+  cycleOverall: string;
+  cycleTrend: string;
+  cycleNoHistory: string;
+  cycleLoadError: string;
+  cycleImproved: string;
+  cycleDeclined: string;
+  cycleStable: string;
   showing: string;
   of: string;
   records: string;
@@ -469,6 +482,19 @@ const pt: Translation = {
   importing: 'Importando...',
   importSuccess: 'Importação concluída! Ciclo {ciclo} criado com {count} fornecedores.',
   importError: 'Não foi possível concluir a importação. Verifique o arquivo e tente novamente.',
+  importCycleDetected: 'Ciclo detectado: {ciclo}',
+  importCycleMissing: 'O nome do arquivo precisa conter o mês e o ano, por exemplo "Scorecard Supplier - 01.2026.xlsx".',
+  noCyclesYet: 'Nenhum ciclo importado ainda.',
+  cycleHistory: 'Evolução por ciclo',
+  cycleHistoryDesc: 'Compare a média de avaliação de cada fornecedor entre os ciclos importados.',
+  cycleHistoryButton: 'Evolução',
+  cycleOverall: 'Média geral por ciclo',
+  cycleTrend: 'Tendência',
+  cycleNoHistory: 'Ainda não há avaliações registradas para seus fornecedores.',
+  cycleLoadError: 'Não foi possível carregar o histórico de ciclos.',
+  cycleImproved: 'Melhora',
+  cycleDeclined: 'Queda',
+  cycleStable: 'Estável',
   showing: 'Mostrando',
   of: 'de',
   records: 'registros',
@@ -765,6 +791,19 @@ const en: Translation = {
   importStepOrders: 'Importing purchase orders',
   importSuccess: 'Import complete! Cycle {ciclo} created with {count} suppliers.',
   importError: 'Could not complete the import. Check the file and try again.',
+  importCycleDetected: 'Cycle detected: {ciclo}',
+  importCycleMissing: 'The file name must include the month and year, for example "Scorecard Supplier - 01.2026.xlsx".',
+  noCyclesYet: 'No cycles imported yet.',
+  cycleHistory: 'Evolution by cycle',
+  cycleHistoryDesc: 'Compare each supplier\'s average score across imported cycles.',
+  cycleHistoryButton: 'Evolution',
+  cycleOverall: 'Overall average by cycle',
+  cycleTrend: 'Trend',
+  cycleNoHistory: 'There are no recorded evaluations for your suppliers yet.',
+  cycleLoadError: 'Could not load the cycle history.',
+  cycleImproved: 'Improved',
+  cycleDeclined: 'Declined',
+  cycleStable: 'Stable',
   showing: 'Showing',
   of: 'of',
   records: 'records',
@@ -1059,6 +1098,19 @@ const pl: Translation = {
   importStepOrders: 'Importowanie zamówień zakupu',
   importSuccess: 'Import zakończony! Cykl {ciclo} utworzony z {count} dostawcami.',
   importError: 'Nie udało się ukończyć importu. Sprawdź plik i spróbuj ponownie.',
+  importCycleDetected: 'Wykryty cykl: {ciclo}',
+  importCycleMissing: 'Nazwa pliku musi zawierać miesiąc i rok, na przykład "Scorecard Supplier - 01.2026.xlsx".',
+  noCyclesYet: 'Nie zaimportowano jeszcze żadnego cyklu.',
+  cycleHistory: 'Ewolucja według cykli',
+  cycleHistoryDesc: 'Porównaj średnią ocenę każdego dostawcy między zaimportowanymi cyklami.',
+  cycleHistoryButton: 'Ewolucja',
+  cycleOverall: 'Średnia ogólna według cyklu',
+  cycleTrend: 'Trend',
+  cycleNoHistory: 'Nie ma jeszcze zapisanych ocen dla Twoich dostawców.',
+  cycleLoadError: 'Nie udało się wczytać historii cykli.',
+  cycleImproved: 'Poprawa',
+  cycleDeclined: 'Spadek',
+  cycleStable: 'Stabilnie',
   showing: 'Pokazuję',
   of: 'z',
   records: 'rekordów',
@@ -1351,6 +1403,19 @@ const es: Translation = {
   importing: 'Importando...',
   importSuccess: '¡Importación completada! Ciclo {ciclo} creado con {count} proveedores.',
   importError: 'No se pudo completar la importación. Verifique el archivo e intente nuevamente.',
+  importCycleDetected: 'Ciclo detectado: {ciclo}',
+  importCycleMissing: 'El nombre del archivo debe incluir el mes y el año, por ejemplo "Scorecard Supplier - 01.2026.xlsx".',
+  noCyclesYet: 'Aún no hay ciclos importados.',
+  cycleHistory: 'Evolución por ciclo',
+  cycleHistoryDesc: 'Compare la media de evaluación de cada proveedor entre los ciclos importados.',
+  cycleHistoryButton: 'Evolución',
+  cycleOverall: 'Media general por ciclo',
+  cycleTrend: 'Tendencia',
+  cycleNoHistory: 'Aún no hay evaluaciones registradas para sus proveedores.',
+  cycleLoadError: 'No se pudo cargar el historial de ciclos.',
+  cycleImproved: 'Mejora',
+  cycleDeclined: 'Descenso',
+  cycleStable: 'Estable',
   showing: 'Mostrando',
   of: 'de',
   records: 'registros',
