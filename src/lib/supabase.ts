@@ -145,12 +145,9 @@ export function classificacaoMedia(media: number, labels?: { poor: string; good:
   return { label: labels?.excellent ?? 'Ótimo', color: 'text-emerald-400', bg: 'bg-emerald-500/15' };
 }
 
-export function gerarCiclo(): string {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth() + 1;
-  const semestre = month <= 6 ? '1' : '2';
-  return `${year}-${semestre}`;
+export function parseCicloFromFileName(fileName: string): string | null {
+  const match = fileName.match(/(0[1-9]|1[0-2])\.(\d{4})\.xlsx$/i);
+  return match ? `${match[1]}/${match[2]}` : null;
 }
 
 /**

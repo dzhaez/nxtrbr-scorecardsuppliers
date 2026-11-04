@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Upload, FileSpreadsheet, ArrowLeft, Loader2, CheckCircle2, AlertCircle, History, BarChart3, Shield, UserPlus, Trash2 } from 'lucide-react';
-import { supabase, gerarCiclo, type Importacao, type Acesso } from '@/lib/supabase';
+import { supabase, parseCicloFromFileName, type Importacao, type Acesso } from '@/lib/supabase';
 import { setting } from '@/lib/config';
 
 import { useI18n } from '@/i18n/LanguageContext';
@@ -48,6 +48,7 @@ export default function AdminScreen({ onBack }: AdminScreenProps) {
   const { t, locale } = useI18n();
   const [file, setFile] = useState<File | null>(null);
   const [parsedData, setParsedData] = useState<ParsedRow[]>([]);
+  const [importCiclo, setImportCiclo] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
   const [importProgress, setImportProgress] = useState<{ step: string; current: number; total: number } | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -171,9 +172,18 @@ export default function AdminScreen({ onBack }: AdminScreenProps) {
   function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0];
     if (!f) return;
+    const detectedCiclo = parseCicloFromFileName(f.name);
     setFile(f);
     setParsedData([]);
     setMessage(null);
+    setImportCiclo(detectedCiclo);
+    if (!detectedCiclo) {
+      setFile(null);
+      setMessage({ type: 'error', text: t.importCycleMissing });
+      if (inputRef.current) inputRef.current.value = '';
+      return;
+    }
+    setMessage({ type: 'success', text: t.importCycleDetected.replace('{ciclo}', detectedCiclo) });
     const reader = new FileReader();
     reader.onload = async (ev) => {
       try {
@@ -214,11 +224,11 @@ export default function AdminScreen({ onBack }: AdminScreenProps) {
   }
 
   async function handleImport() {
-    if (parsedData.length === 0) return;
+    if (parsedData.length === 0 || !importCiclo) return;
     setImporting(true);
     setMessage(null);
     try {
-      const ciclo = gerarCiclo();
+      const ciclo = importCiclo;
 
       const { data: impData, error: impError } = await supabase
         .from('importacoes')
@@ -288,6 +298,7 @@ export default function AdminScreen({ onBack }: AdminScreenProps) {
       });
       setFile(null);
       setParsedData([]);
+      setImportCiclo(null);
       if (inputRef.current) inputRef.current.value = '';
       void impData;
       await loadCicloAtual();
