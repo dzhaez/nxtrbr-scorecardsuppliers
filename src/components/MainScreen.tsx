@@ -297,6 +297,32 @@ export default function MainScreen({ userId, userEmail, isAdmin, onLogout }: Mai
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+        {ciclos.length > 0 && (
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t.cycleSelectLabel}</span>
+            <div role="group" aria-label={t.cycleSelectLabel} className="inline-flex rounded-lg border border-border bg-card p-1 shadow-sm">
+              {ciclos.map((c) => {
+                const active = c === selectedCiclo;
+                return (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setSelectedCiclo(c)}
+                    aria-pressed={active}
+                    className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all duration-200 ${
+                      active
+                        ? 'bg-primary text-primary-foreground shadow'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                    }`}
+                  >
+                    {t.cycle} {c}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Dashboard */}
         <Dashboard suppliers={suppliers} activeFilter={kpiFilter} onFilterChange={setKpiFilter} />
 
@@ -312,21 +338,6 @@ export default function MainScreen({ userId, userEmail, isAdmin, onLogout }: Mai
             />
           </div>
           <div className="flex flex-wrap items-end gap-2">
-            {ciclos.length > 0 && (
-              <div className="flex flex-col gap-1">
-                <span className="text-xs font-medium text-muted-foreground">{t.cycleSelectLabel}</span>
-                <Select value={selectedCiclo} onValueChange={setSelectedCiclo}>
-                  <SelectTrigger className="w-44 h-10" aria-label={t.cycleSelectLabel}>
-                    <SelectValue placeholder={t.cycle} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {ciclos.map((c) => (
-                      <SelectItem key={c} value={c}>{t.cycle} {c}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
             <Select value={filterCommodity} onValueChange={setFilterCommodity}>
               <SelectTrigger className="w-40 h-10">
                 <SelectValue placeholder="Commodity" />
