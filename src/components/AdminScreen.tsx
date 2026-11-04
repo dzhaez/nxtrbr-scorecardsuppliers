@@ -5,9 +5,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Upload, FileSpreadsheet, ArrowLeft, Loader2, CheckCircle2, AlertCircle, History, BarChart3, Shield, UserPlus, Trash2 } from 'lucide-react';
+import { Upload, FileSpreadsheet, ArrowLeft, Loader2, CheckCircle2, AlertCircle, History, BarChart3, Shield, UserPlus, Trash2, CalendarDays } from 'lucide-react';
 import { supabase, parseCicloFromFileName, type Importacao, type Acesso } from '@/lib/supabase';
 import { setting } from '@/lib/config';
+import CyclesPanel from './CyclesPanel';
 
 import { useI18n } from '@/i18n/LanguageContext';
 const ManagementPanel = lazy(() => import('./ManagementPanel'));
@@ -56,6 +57,8 @@ export default function AdminScreen({ onBack }: AdminScreenProps) {
   const [acessos, setAcessos] = useState<Acesso[]>([]);
   const [showHistory, setShowHistory] = useState(false);
   const [currentCiclo, setCurrentCiclo] = useState('');
+  const [activeTab, setActiveTab] = useState('painel');
+  const [painelCiclo, setPainelCiclo] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [adminAuths, setAdminAuths] = useState<AdminAuthorization[]>([]);
@@ -335,13 +338,17 @@ export default function AdminScreen({ onBack }: AdminScreenProps) {
       </header>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-        <Tabs defaultValue="painel" className="w-full" onValueChange={(v) => {
+        <Tabs value={activeTab} className="w-full" onValueChange={(v) => {
+          setActiveTab(v);
           if (v === 'acessos') loadAcessos();
           if (v === 'admins') { loadAdminAuths(); loadAuditLog(); }
         }}>
-          <TabsList className="grid w-full grid-cols-4 max-w-lg mb-6">
+          <TabsList className="grid w-full grid-cols-5 max-w-2xl mb-6">
             <TabsTrigger value="painel">
               <BarChart3 className="w-4 h-4 mr-2" /> {t.panel}
+            </TabsTrigger>
+            <TabsTrigger value="ciclos">
+              <CalendarDays className="w-4 h-4 mr-2" /> {t.tabCycles}
             </TabsTrigger>
             <TabsTrigger value="importar">
               <Upload className="w-4 h-4 mr-2" /> {t.import}
@@ -356,8 +363,21 @@ export default function AdminScreen({ onBack }: AdminScreenProps) {
 
           <TabsContent value="painel">
             <Suspense fallback={<div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}>
-              <ManagementPanel cicloAtual={currentCiclo} />
+              <ManagementPanel cicloAtual={painelCiclo || currentCiclo} />
             </Suspense>
+          </TabsContent>
+
+          <TabsContent value="ciclos">
+            <CyclesPanel
+              onViewResults={(ciclo) => {
+                setPainelCiclo(ciclo);
+                setActiveTab('painel');
+              }}
+              onCycleRemoved={() => {
+                setPainelCiclo('');
+                void loadCicloAtual();
+              }}
+            />
           </TabsContent>
 
           <TabsContent value="importar">

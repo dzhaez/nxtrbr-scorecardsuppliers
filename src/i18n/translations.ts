@@ -217,6 +217,21 @@ export interface Translation {
   // Management panel
   managementPanel: string;
   managementPanelDesc: string;
+  tabCycles: string;
+  cyclesTitle: string;
+  cyclesDesc: string;
+  cyclesEmpty: string;
+  cyclesLoadError: string;
+  cycleImportedOn: string;
+  cycleSuppliers: string;
+  cycleEvaluated: string;
+  cycleAvgScore: string;
+  cycleViewResults: string;
+  cycleRemove: string;
+  cycleRemoveTitle: string;
+  cycleRemoveConfirm: string;
+  cycleRemoveError: string;
+  cycleRemoved: string;
   loadingPanel: string;
   evaluations: string;
   pendingKpi: string;
@@ -534,6 +549,21 @@ const pt: Translation = {
 
   managementPanel: 'Painel de Gerenciamento Estratégico',
   managementPanelDesc: 'Visão geral do ciclo {ciclo} e histórico completo',
+  tabCycles: 'Ciclos',
+  cyclesTitle: 'Ciclos importados',
+  cyclesDesc: 'Scorecard consolidado por ciclo. Abra um ciclo para ver os resultados das avaliações.',
+  cyclesEmpty: 'Nenhum ciclo importado ainda.',
+  cyclesLoadError: 'Não foi possível carregar os ciclos. Tente atualizar a página.',
+  cycleImportedOn: 'Importado em',
+  cycleSuppliers: 'Fornecedores',
+  cycleEvaluated: 'Avaliados',
+  cycleAvgScore: 'Média geral',
+  cycleViewResults: 'Ver resultados',
+  cycleRemove: 'Remover base',
+  cycleRemoveTitle: 'Remover a base deste ciclo?',
+  cycleRemoveConfirm: 'Os pedidos, avaliações e comentários do ciclo {ciclo} serão apagados permanentemente. Esta ação não pode ser desfeita.',
+  cycleRemoveError: 'Não foi possível remover a base deste ciclo.',
+  cycleRemoved: 'Base do ciclo {ciclo} removida.',
   loadingPanel: 'Carregando dados do painel...',
   evaluations: 'Avaliações',
   pendingKpi: 'Pendentes',
@@ -841,6 +871,21 @@ const en: Translation = {
 
   managementPanel: 'Strategic Management Panel',
   managementPanelDesc: 'Overview of cycle {ciclo} and complete history',
+  tabCycles: 'Cycles',
+  cyclesTitle: 'Imported cycles',
+  cyclesDesc: 'Consolidated scorecard per cycle. Open a cycle to see the evaluation results.',
+  cyclesEmpty: 'No cycles imported yet.',
+  cyclesLoadError: 'Could not load the cycles. Try refreshing the page.',
+  cycleImportedOn: 'Imported on',
+  cycleSuppliers: 'Suppliers',
+  cycleEvaluated: 'Evaluated',
+  cycleAvgScore: 'Overall average',
+  cycleViewResults: 'View results',
+  cycleRemove: 'Remove data',
+  cycleRemoveTitle: 'Remove this cycle\'s data?',
+  cycleRemoveConfirm: 'Orders, evaluations and comments for cycle {ciclo} will be permanently deleted. This cannot be undone.',
+  cycleRemoveError: 'Could not remove the data for this cycle.',
+  cycleRemoved: 'Data for cycle {ciclo} removed.',
   loadingPanel: 'Loading panel data...',
   evaluations: 'Evaluations',
   pendingKpi: 'Pending',
@@ -1148,6 +1193,21 @@ const pl: Translation = {
 
   managementPanel: 'Panel Zarządzania Strategicznego',
   managementPanelDesc: 'Przegląd cyklu {ciclo} i pełna historia',
+  tabCycles: 'Cykle',
+  cyclesTitle: 'Zaimportowane cykle',
+  cyclesDesc: 'Skonsolidowana karta wyników dla każdego cyklu. Otwórz cykl, aby zobaczyć wyniki ocen.',
+  cyclesEmpty: 'Brak zaimportowanych cykli.',
+  cyclesLoadError: 'Nie udało się załadować cykli. Odśwież stronę.',
+  cycleImportedOn: 'Zaimportowano',
+  cycleSuppliers: 'Dostawcy',
+  cycleEvaluated: 'Ocenieni',
+  cycleAvgScore: 'Średnia ogólna',
+  cycleViewResults: 'Zobacz wyniki',
+  cycleRemove: 'Usuń dane',
+  cycleRemoveTitle: 'Usunąć dane tego cyklu?',
+  cycleRemoveConfirm: 'Zamówienia, oceny i komentarze cyklu {ciclo} zostaną trwale usunięte. Tej operacji nie można cofnąć.',
+  cycleRemoveError: 'Nie udało się usunąć danych tego cyklu.',
+  cycleRemoved: 'Dane cyklu {ciclo} zostały usunięte.',
   loadingPanel: 'Ładowanie danych panelu...',
   evaluations: 'Oceny',
   pendingKpi: 'Oczekujący',
@@ -1455,6 +1515,21 @@ const es: Translation = {
 
   managementPanel: 'Panel de Gestión Estratégica',
   managementPanelDesc: 'Vista general del ciclo {ciclo} e historial completo',
+  tabCycles: 'Ciclos',
+  cyclesTitle: 'Ciclos importados',
+  cyclesDesc: 'Scorecard consolidado por ciclo. Abra un ciclo para ver los resultados de las evaluaciones.',
+  cyclesEmpty: 'Aún no hay ciclos importados.',
+  cyclesLoadError: 'No se pudieron cargar los ciclos. Intente actualizar la página.',
+  cycleImportedOn: 'Importado el',
+  cycleSuppliers: 'Proveedores',
+  cycleEvaluated: 'Evaluados',
+  cycleAvgScore: 'Promedio general',
+  cycleViewResults: 'Ver resultados',
+  cycleRemove: 'Eliminar base',
+  cycleRemoveTitle: '¿Eliminar la base de este ciclo?',
+  cycleRemoveConfirm: 'Los pedidos, evaluaciones y comentarios del ciclo {ciclo} se borrarán permanentemente. Esta acción no se puede deshacer.',
+  cycleRemoveError: 'No se pudo eliminar la base de este ciclo.',
+  cycleRemoved: 'Base del ciclo {ciclo} eliminada.',
   loadingPanel: 'Cargando datos del panel...',
   evaluations: 'Evaluaciones',
   pendingKpi: 'Pendientes',
