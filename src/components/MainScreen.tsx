@@ -30,7 +30,8 @@ export default function MainScreen({ userId, userEmail, isAdmin, onLogout }: Mai
   const [sortField, setSortField] = useState<SortField>('ordem');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
   const [evaluatingSupplier, setEvaluatingSupplier] = useState<SupplierWithOrders | null>(null);
-  const [currentCiclo, setCurrentCiclo] = useState('');
+  const [ciclos, setCiclos] = useState<string[]>([]);
+  const [selectedCiclo, setSelectedCiclo] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [kpiFilter, setKpiFilter] = useState<KpiFilter>('todos');
   const [filterCommodity, setFilterCommodity] = useState<string>('all');
@@ -38,14 +39,27 @@ export default function MainScreen({ userId, userEmail, isAdmin, onLogout }: Mai
   const [filterStatus, setFilterStatus] = useState<'all' | 'avaliado' | 'pendente'>('all');
   const [filterOwner, setFilterOwner] = useState<string>('all');
 
+  const loadCiclos = useCallback(async () => {
+    const { data, error } = await supabase.rpc('list_ciclos');
+    if (error || !Array.isArray(data)) {
+      console.error('Failed to load cycles:', error);
+      setCiclos([]);
+      setSelectedCiclo('');
+      return;
+    }
+    const lista = (data as { ciclo: string }[]).map((r) => r.ciclo);
+    setCiclos(lista);
+    setSelectedCiclo((atual) => (lista.includes(atual) ? atual : lista[0] ?? ''));
+  }, []);
+
+  useEffect(() => {
+    loadCiclos();
+  }, [loadCiclos]);
+
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const { data: cicloAtual } = await supabase.rpc('get_ciclo_atual');
-
-      const ciclo = (cicloAtual as string | null) || '';
-      setCurrentCiclo(ciclo);
-
+      const ciclo = selectedCiclo;
       if (!ciclo) {
         setSuppliers([]);
         setLoading(false);
@@ -130,7 +144,7 @@ export default function MainScreen({ userId, userEmail, isAdmin, onLogout }: Mai
       setLoading(false);
       setRefreshing(false);
     }
-  }, [isAdmin, userId]);
+  }, [isAdmin, userId, selectedCiclo]);
 
   useEffect(() => {
     loadData();
@@ -262,7 +276,7 @@ export default function MainScreen({ userId, userEmail, isAdmin, onLogout }: Mai
               </h1>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <span className="font-medium text-foreground/80">{userEmail || userId}</span>
-                {currentCiclo && <span>· {t.cycle} {currentCiclo}</span>}
+                {selectedCiclo && <span>· {t.cycle} {selectedCiclo}</span>}
               </div>
             </div>
           </div>
@@ -298,6 +312,18 @@ export default function MainScreen({ userId, userEmail, isAdmin, onLogout }: Mai
             />
           </div>
           <div className="flex flex-wrap gap-2">
+            {ciclos.length > 0 && (
+              <Select value={selectedCiclo} onValueChange={setSelectedCiclo}>
+                <SelectTrigger className="w-44 h-10">
+                  <SelectValue placeholder={t.cycle} />
+                </SelectTrigger>
+                <SelectContent>
+                  {ciclos.map((c) => (
+                    <SelectItem key={c} value={c}>{t.cycle} {c}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
             <Select value={filterCommodity} onValueChange={setFilterCommodity}>
               <SelectTrigger className="w-40 h-10">
                 <SelectValue placeholder="Commodity" />
@@ -357,7 +383,9 @@ export default function MainScreen({ userId, userEmail, isAdmin, onLogout }: Mai
         ) : filteredAndSorted.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-muted-foreground">
-              {suppliers.length === 0
+              {ciclos.length === 0
+                ? t.noCyclesYet
+                : suppliers.length === 0
                 ? t.noSuppliersForUser
                 : t.noSuppliersMatchSearch}
             </p>
@@ -433,7 +461,7 @@ export default function MainScreen({ userId, userEmail, isAdmin, onLogout }: Mai
           <EvaluationForm
             supplier={evaluatingSupplier}
             userId={userId}
-            ciclo={currentCiclo}
+            ciclo={selectedCiclo}
             onClose={() => setEvaluatingSupplier(null)}
             onSaved={() => {
               setEvaluatingSupplier(null);
