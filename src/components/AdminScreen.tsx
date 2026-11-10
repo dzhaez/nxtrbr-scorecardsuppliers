@@ -25,6 +25,7 @@ interface ParsedRow {
   commodities: string;
   idUsuario: string;
   owner: string;
+  email: string;
 }
 
 interface AdminAuthorization {
@@ -212,6 +213,7 @@ export default function AdminScreen({ onBack }: AdminScreenProps) {
             commodities: get(['Commodities', 'Commodity', 'Commodit']),
             idUsuario: get(['IDUSER', 'IdUsuario', 'IDUsuario', 'ID']),
             owner: get(['OWNER', 'Owner']),
+            email: get(['E-mail', 'Email', 'EMAIL']),
           };
         }).filter((r) => r.cnpjCpf && r.ord);
         setParsedData(mapped);
@@ -429,6 +431,7 @@ export default function AdminScreen({ onBack }: AdminScreenProps) {
                       <li>• {t.colCommodities}</li>
                       <li>• {t.colIdUser}</li>
                       <li>• {t.colOwner}</li>
+                      <li>• {t.colEmail}</li>
                     </ul>
                   </div>
 
@@ -458,6 +461,7 @@ export default function AdminScreen({ onBack }: AdminScreenProps) {
                                 <TableHead>{t.colCommodities}</TableHead>
                                 <TableHead>{t.colIdUser}</TableHead>
                                 <TableHead>{t.colOwner}</TableHead>
+                                <TableHead>{t.colEmail}</TableHead>
                               </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -469,6 +473,7 @@ export default function AdminScreen({ onBack }: AdminScreenProps) {
                                   <TableCell className="text-xs">{r.commodities}</TableCell>
                                   <TableCell className="text-xs">{r.idUsuario}</TableCell>
                                   <TableCell className="text-xs">{r.owner}</TableCell>
+                                  <TableCell className="text-xs">{r.email}</TableCell>
                                 </TableRow>
                               ))}
                             </TableBody>

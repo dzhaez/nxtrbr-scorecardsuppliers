@@ -155,6 +155,7 @@ export interface Translation {
   colCommodities: string;
   colIdUser: string;
   colOwner: string;
+  colEmail: string;
   noValidRecords: string;
   errorReadingFile: string;
   importAndGenerate: string;
@@ -493,6 +494,7 @@ const pt: Translation = {
   colCommodities: 'Commodities',
   colIdUser: 'ID USER',
   colOwner: 'OWNER',
+  colEmail: 'E-mail',
   noValidRecords: 'Nenhum registro válido encontrado. Verifique as colunas da planilha.',
   errorReadingFile: 'Erro ao ler o arquivo. Verifique se é um Excel válido (.xlsx).',
   importAndGenerate: 'Importar e Gerar Novo Ciclo',
@@ -817,6 +819,7 @@ const en: Translation = {
   colCommodities: 'Commodities',
   colIdUser: 'ID USER',
   colOwner: 'OWNER',
+  colEmail: 'E-mail',
   noValidRecords: 'No valid records found. Check the spreadsheet columns.',
   errorReadingFile: 'Error reading file. Check if it is a valid Excel file (.xlsx).',
   importAndGenerate: 'Import and Generate New Cycle',
@@ -1141,6 +1144,7 @@ const pl: Translation = {
   colCommodities: 'Commodities',
   colIdUser: 'ID USER',
   colOwner: 'OWNER',
+  colEmail: 'E-mail',
   noValidRecords: 'Nie znaleziono prawidłowych rekordów. Sprawdź kolumny arkusza.',
   errorReadingFile: 'Błąd odczytu pliku. Sprawdź, czy jest prawidłowy plik Excel (.xlsx).',
   importAndGenerate: 'Importuj i Wygeneruj Nowy Cykl',
@@ -1465,6 +1469,7 @@ const es: Translation = {
   colCommodities: 'Commodities',
   colIdUser: 'ID USER',
   colOwner: 'OWNER',
+  colEmail: 'E-mail',
   noValidRecords: 'No se encontraron registros válidos. Verifique las columnas de la hoja.',
   errorReadingFile: 'Error al leer el archivo. Verifique si es un Excel válido (.xlsx).',
   importAndGenerate: 'Importar y Generar Nuevo Ciclo',
