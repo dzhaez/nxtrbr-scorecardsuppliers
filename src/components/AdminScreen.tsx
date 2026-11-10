@@ -270,7 +270,7 @@ export default function AdminScreen({ onBack }: AdminScreenProps) {
       await supabase.from('ordens_compra').delete().eq('ciclo', ciclo);
 
       const seen = new Set<string>();
-      const ordensToInsert: { codigo_fornecedor: string; ordem_compra: string; numero_requisicao: string; data: string | null; id_usuario: string; ciclo: string; loc_emb: string | null; nome_clas: string | null; commodities: string | null; owner: string | null }[] = [];
+      const ordensToInsert: { codigo_fornecedor: string; ordem_compra: string; numero_requisicao: string; data: string | null; id_usuario: string; ciclo: string; loc_emb: string | null; nome_clas: string | null; commodities: string | null; owner: string | null; email: string | null }[] = [];
       parsedData.forEach((r) => {
         const key = `${r.cnpjCpf}|${r.ord}`;
         if (seen.has(key)) return;
@@ -286,6 +286,7 @@ export default function AdminScreen({ onBack }: AdminScreenProps) {
           nome_clas: r.nomeClas || null,
           commodities: r.commodities || null,
           owner: r.owner || null,
+          email: r.email || null,
         });
       });
       const totalOrdemChunks = Math.ceil(ordensToInsert.length / 500);
