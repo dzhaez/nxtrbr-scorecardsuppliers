@@ -198,9 +198,10 @@ export default function AdminScreen({ onBack }: AdminScreenProps) {
         const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, { defval: '' });
         const mapped: ParsedRow[] = rows.map((row) => {
           const keys = Object.keys(row);
+          const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
           const get = (aliases: string[]) => {
             for (const a of aliases) {
-              const found = keys.find((k) => k.toLowerCase().replace(/\s+/g, '').includes(a.toLowerCase()));
+              const found = keys.find((k) => normalize(k).includes(normalize(a)));
               if (found) return String(row[found] ?? '').trim();
             }
             return '';
