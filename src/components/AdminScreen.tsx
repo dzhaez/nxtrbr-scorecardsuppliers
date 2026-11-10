@@ -427,6 +427,7 @@ export default function AdminScreen({ onBack }: AdminScreenProps) {
                   <div className="text-sm text-muted-foreground">
                     <p className="font-medium text-foreground mb-2">{t.expectedColumns}</p>
                     <ul className="grid grid-cols-2 gap-1 text-xs">
+                      <li>• {t.colOrd}</li>
                       <li>• {t.colLocEmb}</li>
                       <li>• {t.colNomeClas}</li>
                       <li>• {t.colCnpjCpf}</li>

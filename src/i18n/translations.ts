@@ -149,6 +149,7 @@ export interface Translation {
   supportedFormats: string;
   recordsDetected: string;
   expectedColumns: string;
+  colOrd: string;
   colLocEmb: string;
   colNomeClas: string;
   colCnpjCpf: string;
@@ -488,6 +489,7 @@ const pt: Translation = {
   supportedFormats: 'Formatos suportados: .xlsx, .xls',
   recordsDetected: 'registros detectados',
   expectedColumns: 'Colunas esperadas na planilha:',
+  colOrd: 'ORD.',
   colLocEmb: 'Loc Emb',
   colNomeClas: 'Nome Clas',
   colCnpjCpf: 'CNPJ/CPF',
@@ -813,6 +815,7 @@ const en: Translation = {
   supportedFormats: 'Supported formats: .xlsx, .xls',
   recordsDetected: 'records detected',
   expectedColumns: 'Expected columns in the spreadsheet:',
+  colOrd: 'ORD.',
   colLocEmb: 'Loc Emb',
   colNomeClas: 'Nome Clas',
   colCnpjCpf: 'CNPJ/CPF',
@@ -1138,6 +1141,7 @@ const pl: Translation = {
   supportedFormats: 'Obsługiwane formaty: .xlsx, .xls',
   recordsDetected: 'wykrytych rekordów',
   expectedColumns: 'Oczekiwane kolumny w arkuszu:',
+  colOrd: 'ORD.',
   colLocEmb: 'Loc Emb',
   colNomeClas: 'Nome Clas',
   colCnpjCpf: 'CNPJ/CPF',
@@ -1463,6 +1467,7 @@ const es: Translation = {
   supportedFormats: 'Formatos soportados: .xlsx, .xls',
   recordsDetected: 'registros detectados',
   expectedColumns: 'Columnas esperadas en la hoja:',
+  colOrd: 'ORD.',
   colLocEmb: 'Loc Emb',
   colNomeClas: 'Nombre Clas',
   colCnpjCpf: 'CNPJ/CPF',
