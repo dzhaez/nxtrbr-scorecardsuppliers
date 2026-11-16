@@ -5,13 +5,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Upload, FileSpreadsheet, ArrowLeft, Loader2, CheckCircle2, AlertCircle, History, BarChart3, Shield, UserPlus, Trash2, CalendarDays } from 'lucide-react';
+import { Upload, FileSpreadsheet, ArrowLeft, Loader2, CheckCircle2, AlertCircle, History, BarChart3, Shield, UserPlus, Trash2, CalendarDays, Gauge } from 'lucide-react';
 import { supabase, parseCicloFromFileName, type Importacao, type Acesso } from '@/lib/supabase';
 import { setting } from '@/lib/config';
 import CyclesPanel from './CyclesPanel';
 
 import { useI18n } from '@/i18n/LanguageContext';
 const ManagementPanel = lazy(() => import('./ManagementPanel'));
+const SlaPanel = lazy(() => import('./SlaPanel'));
 
 interface AdminScreenProps {
   onBack: () => void;
@@ -347,12 +348,15 @@ export default function AdminScreen({ onBack }: AdminScreenProps) {
           if (v === 'acessos') loadAcessos();
           if (v === 'admins') { loadAdminAuths(); loadAuditLog(); }
         }}>
-          <TabsList className="grid w-full grid-cols-5 max-w-2xl mb-6">
+          <TabsList className="grid w-full grid-cols-6 max-w-3xl mb-6">
             <TabsTrigger value="painel">
               <BarChart3 className="w-4 h-4 mr-2" /> {t.panel}
             </TabsTrigger>
             <TabsTrigger value="ciclos">
               <CalendarDays className="w-4 h-4 mr-2" /> {t.tabCycles}
+            </TabsTrigger>
+            <TabsTrigger value="sla">
+              <Gauge className="w-4 h-4 mr-2" /> {t.tabSla}
             </TabsTrigger>
             <TabsTrigger value="importar">
               <Upload className="w-4 h-4 mr-2" /> {t.import}
@@ -382,6 +386,12 @@ export default function AdminScreen({ onBack }: AdminScreenProps) {
                 void loadCicloAtual();
               }}
             />
+          </TabsContent>
+
+          <TabsContent value="sla">
+            <Suspense fallback={<div className="flex items-center justify-center py-20"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}>
+              <SlaPanel ciclo={painelCiclo || currentCiclo} />
+            </Suspense>
           </TabsContent>
 
           <TabsContent value="importar">

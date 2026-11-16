@@ -151,6 +151,24 @@ export interface Translation {
   expectedColumns: string;
   colOrd: string;
   colLocEmb: string;
+  tabSla: string;
+  slaPanelTitle: string;
+  slaPanelDesc: string;
+  slaNoData: string;
+  slaOwnersCount: string;
+  slaOverallProgress: string;
+  slaCriticalOwners: string;
+  slaPendingTotal: string;
+  slaByOwner: string;
+  slaProgress: string;
+  slaEvaluated: string;
+  slaDaysWithout: string;
+  slaSendReminder: string;
+  slaEmailSent: string;
+  slaNoEmail: string;
+  slaNoPending: string;
+  slaEmailNotConfigured: string;
+  slaSendError: string;
   colNomeClas: string;
   colCnpjCpf: string;
   colCommodities: string;
@@ -489,6 +507,24 @@ const pt: Translation = {
   supportedFormats: 'Formatos suportados: .xlsx, .xls',
   recordsDetected: 'registros detectados',
   expectedColumns: 'Colunas esperadas na planilha:',
+  tabSla: 'SLA',
+  slaPanelTitle: 'Painel de SLA por OWNER',
+  slaPanelDesc: 'Acompanhamento do progresso de avaliação por requisitante e envio de lembretes por e-mail',
+  slaNoData: 'Nenhum OWNER encontrado para este ciclo.',
+  slaOwnersCount: 'OWNERS',
+  slaOverallProgress: 'Progresso geral',
+  slaCriticalOwners: 'Owners críticos (15+ dias)',
+  slaPendingTotal: 'Fornecedores pendentes',
+  slaByOwner: 'Indicadores por OWNER',
+  slaProgress: 'Progresso',
+  slaEvaluated: 'Avaliados',
+  slaDaysWithout: 'Dias sem avaliação',
+  slaSendReminder: 'Enviar lembrete',
+  slaEmailSent: 'Lembrete enviado para {owner}.',
+  slaNoEmail: 'Este OWNER não tem e-mail na planilha importada.',
+  slaNoPending: 'Este OWNER não tem pendências.',
+  slaEmailNotConfigured: 'O envio de e-mails ainda não está configurado no servidor.',
+  slaSendError: 'Não foi possível enviar o lembrete. Tente novamente.',
   colOrd: 'ORD.',
   colLocEmb: 'Loc Emb',
   colNomeClas: 'Nome Clas',
@@ -815,6 +851,24 @@ const en: Translation = {
   supportedFormats: 'Supported formats: .xlsx, .xls',
   recordsDetected: 'records detected',
   expectedColumns: 'Expected columns in the spreadsheet:',
+  tabSla: 'SLA',
+  slaPanelTitle: 'SLA Panel by OWNER',
+  slaPanelDesc: 'Track evaluation progress per requisitioner and send reminder e-mails',
+  slaNoData: 'No OWNER found for this cycle.',
+  slaOwnersCount: 'OWNERS',
+  slaOverallProgress: 'Overall progress',
+  slaCriticalOwners: 'Critical owners (15+ days)',
+  slaPendingTotal: 'Pending suppliers',
+  slaByOwner: 'Indicators by OWNER',
+  slaProgress: 'Progress',
+  slaEvaluated: 'Evaluated',
+  slaDaysWithout: 'Days without evaluation',
+  slaSendReminder: 'Send reminder',
+  slaEmailSent: 'Reminder sent to {owner}.',
+  slaNoEmail: 'This OWNER has no e-mail in the imported spreadsheet.',
+  slaNoPending: 'This OWNER has no pending evaluations.',
+  slaEmailNotConfigured: 'E-mail delivery is not configured on the server yet.',
+  slaSendError: 'Could not send the reminder. Please try again.',
   colOrd: 'ORD.',
   colLocEmb: 'Loc Emb',
   colNomeClas: 'Nome Clas',
@@ -1141,6 +1195,24 @@ const pl: Translation = {
   supportedFormats: 'Obsługiwane formaty: .xlsx, .xls',
   recordsDetected: 'wykrytych rekordów',
   expectedColumns: 'Oczekiwane kolumny w arkuszu:',
+  tabSla: 'SLA',
+  slaPanelTitle: 'Panel SLA według OWNER',
+  slaPanelDesc: 'Śledzenie postępu ocen według zleceniodawcy i wysyłanie przypomnień e-mail',
+  slaNoData: 'Nie znaleziono OWNER dla tego cyklu.',
+  slaOwnersCount: 'OWNERS',
+  slaOverallProgress: 'Postęp ogólny',
+  slaCriticalOwners: 'Krytyczni właściciele (15+ dni)',
+  slaPendingTotal: 'Oczekujący dostawcy',
+  slaByOwner: 'Wskaźniki według OWNER',
+  slaProgress: 'Postęp',
+  slaEvaluated: 'Ocenione',
+  slaDaysWithout: 'Dni bez oceny',
+  slaSendReminder: 'Wyślij przypomnienie',
+  slaEmailSent: 'Przypomnienie wysłane do {owner}.',
+  slaNoEmail: 'Ten OWNER nie ma adresu e-mail w arkuszu.',
+  slaNoPending: 'Ten OWNER nie ma oczekujących ocen.',
+  slaEmailNotConfigured: 'Wysyłanie e-maili nie jest jeszcze skonfigurowane na serwerze.',
+  slaSendError: 'Nie udało się wysłać przypomnienia. Spróbuj ponownie.',
   colOrd: 'ORD.',
   colLocEmb: 'Loc Emb',
   colNomeClas: 'Nome Clas',
@@ -1467,6 +1539,24 @@ const es: Translation = {
   supportedFormats: 'Formatos soportados: .xlsx, .xls',
   recordsDetected: 'registros detectados',
   expectedColumns: 'Columnas esperadas en la hoja:',
+  tabSla: 'SLA',
+  slaPanelTitle: 'Panel SLA por OWNER',
+  slaPanelDesc: 'Seguimiento del progreso de evaluación por requisitante y envío de recordatorios por correo',
+  slaNoData: 'No se encontró ningún OWNER para este ciclo.',
+  slaOwnersCount: 'OWNERS',
+  slaOverallProgress: 'Progreso general',
+  slaCriticalOwners: 'Owners críticos (15+ días)',
+  slaPendingTotal: 'Proveedores pendientes',
+  slaByOwner: 'Indicadores por OWNER',
+  slaProgress: 'Progreso',
+  slaEvaluated: 'Evaluados',
+  slaDaysWithout: 'Días sin evaluación',
+  slaSendReminder: 'Enviar recordatorio',
+  slaEmailSent: 'Recordatorio enviado a {owner}.',
+  slaNoEmail: 'Este OWNER no tiene correo en la hoja importada.',
+  slaNoPending: 'Este OWNER no tiene evaluaciones pendientes.',
+  slaEmailNotConfigured: 'El envío de correos aún no está configurado en el servidor.',
+  slaSendError: 'No se pudo enviar el recordatorio. Inténtalo de nuevo.',
   colOrd: 'ORD.',
   colLocEmb: 'Loc Emb',
   colNomeClas: 'Nombre Clas',

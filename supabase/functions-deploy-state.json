@@ -4,6 +4,10 @@
     "entra-exchange": {
       "hasChanged": false,
       "hash": "daf0bfea0477067df413e58e8a673168863dfc291ca3483546d26e8663c78edb"
+    },
+    "sla-email": {
+      "hasChanged": false,
+      "hash": "b18e20f5debbb1b278df0be1e18559696d32eda314e1b1d8d122efe8f4a8d71d"
     }
   }
 }

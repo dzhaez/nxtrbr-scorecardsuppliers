@@ -1,2 +1,5 @@
 [functions.entra-exchange]
 verify_jwt = false
+
+[functions.sla-email]
+verify_jwt = true
