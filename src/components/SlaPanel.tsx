@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Loader2, Mail, RefreshCw, AlertCircle, CheckCircle2, Gauge, Clock, Users } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { setting } from '@/lib/config';
 import { useI18n } from '@/i18n/LanguageContext';
 
 export interface SlaIndicator {
@@ -55,7 +56,7 @@ export default function SlaPanel({ ciclo }: SlaPanelProps) {
       const { data: sessionData } = await supabase.auth.getSession();
       const token = sessionData.session?.access_token;
       if (!token) throw new Error('no_session');
-      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/sla-email`;
+      const url = `${setting('VITE_SUPABASE_URL')}/functions/v1/sla-email`;
       const res = await fetch(url, {
         method: 'POST',
         headers: {
